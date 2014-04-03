@@ -32,8 +32,8 @@
 #include "simpleLooper.h"
 
 
-char* version = (char*) "V00-00-02";
-//char* version = (char*) "temp";
+//char* version = (char*) "V00-00-02";
+char* version = (char*) "temp";
 
 using namespace std;
 
@@ -189,7 +189,7 @@ void simpleLooper(char* sample, char* phase, char* config, char* PU, int stbin =
     }
   }
 
-  else if( tsample.Contains("TChiwh") ){
+  else if( tsample.Contains("TChiWH") ){
     doLoop( Form("TChiWH14Pythia_%s_%s_%s"       , phase , config , PU ) , nfiles, true );
   }
 
@@ -375,15 +375,15 @@ float getCrossSection( const string sample ){
   else if ( tsample.Contains("tj-4p-1600-2400-v1510_14TEV"      ) )  xsec = 0.03462;
   else if ( tsample.Contains("tj-4p-2400-100000-v1510_14TEV"    ) )  xsec = 0.00312;
 
-  // WH
-  else if( TString(sample).Contains("ewkino_WH_500_1000"  ) ) xsec =  0.0650 * 1.3 * 0.56;
-  else if( TString(sample).Contains("ewkino_WH_500_2000"  ) ) xsec =  0.0051 * 1.3 * 0.56;
-  else if( TString(sample).Contains("ewkino_WH_500_3000"  ) ) xsec =  0.0010 * 1.3 * 0.56;
+  // // WH
+  // else if( TString(sample).Contains("ewkino_WH_500_1000"  ) ) xsec =  0.0650 * 1.3 * 0.56;
+  // else if( TString(sample).Contains("ewkino_WH_500_2000"  ) ) xsec =  0.0051 * 1.3 * 0.56;
+  // else if( TString(sample).Contains("ewkino_WH_500_3000"  ) ) xsec =  0.0010 * 1.3 * 0.56;
 
-  // WZ
-  else if( TString(sample).Contains("ewkino_WZ_500_1000"  ) ) xsec =  0.0650 * 1.3 * 0.07 * 0.22;
-  else if( TString(sample).Contains("ewkino_WZ_500_2000"  ) ) xsec =  0.0051 * 1.3 * 0.07 * 0.22;
-  else if( TString(sample).Contains("ewkino_WZ_500_3000"  ) ) xsec =  0.0010 * 1.3 * 0.07 * 0.22;
+  // // WZ
+  // else if( TString(sample).Contains("ewkino_WZ_500_1000"  ) ) xsec =  0.0650 * 1.3 * 0.07 * 0.22;
+  // else if( TString(sample).Contains("ewkino_WZ_500_2000"  ) ) xsec =  0.0051 * 1.3 * 0.07 * 0.22;
+  // else if( TString(sample).Contains("ewkino_WZ_500_3000"  ) ) xsec =  0.0010 * 1.3 * 0.07 * 0.22;
 
   cout << "Sample cross section " << xsec << endl;
 
@@ -418,9 +418,11 @@ void InitVars(){
   jet1pt_   = 0. ;
   jet1eta_  = 0. ;
   jet1phi_  = 0. ;
+  jet1genpt_= -1.;
   jet2pt_   = 0. ;
   jet2eta_  = 0. ;
   jet2phi_  = 0. ;
+  jet2genpt_= -1.;
   bjet1pt_  = 0. ;
   bjet1eta_ = 0. ;
   bjet1phi_ = 0. ;
@@ -430,9 +432,11 @@ void InitVars(){
   jet3pt_   = 0. ;
   jet3eta_  = 0. ;
   jet3phi_  = 0. ;
+  jet3genpt_= -1.;
   jet4pt_   = 0. ;
   jet4eta_  = 0. ;
   jet4phi_  = 0. ;
+  jet4genpt_= -1.;
   st_       = 0. ;
   stlep_    = 0. ;
   stweight_ = 0. ;
@@ -450,6 +454,7 @@ void InitVars(){
   drbb_     = 0  ;
   drbbgen_  = 0  ;
   pthgen_   = 0  ;
+  ptc1gen_  = 0  ;
   lep1pt_   = 0. ;
   lep1eta_  = 0. ;
   lep1phi_  = 0. ;
@@ -462,6 +467,12 @@ void InitVars(){
   leptype_  = -1 ;
   // mchi_     = -1 ;
   // mlsp_     = -1 ;
+  mwgen_     = -1. ;
+  mtwgen_    = -1. ;
+  mttgen_    = -1. ;
+  ptttgen_   = -1. ;
+  genmet_    = -1. ;
+  genmetphi_ = -1. ;
 }
 
 //-------------------------------------------
@@ -476,6 +487,41 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
   cout << endl << endl;
   cout << "Running on sample: " << prefix  << endl;
   cout << "Code version     : " << version << endl;
+
+  //--------------------------------------------------------------
+  // input files for sig nevents, xsec
+  //--------------------------------------------------------------
+
+  TString h_nsig_filename = "events_TChiWH.root";
+  cout << "opening mass TH2 file for TChiWH: " << h_nsig_filename << endl;
+
+  TFile *f_nsig = TFile::Open(h_nsig_filename);
+  if( !f_nsig->IsOpen() ){
+    cout << "Error, could not open TChiWH nevents TFile, quitting" << endl;
+    exit(0);
+  }
+  
+  TH2F* h_nsig = (TH2F*) f_nsig->Get("hevts");
+
+  if( h_nsig == 0 ){
+    cout << "Error, could not retrieve TChiWH nevents hist, quitting" << endl;
+    exit(0);
+  }
+
+  TFile* f_c1n2_xsec = TFile::Open("c1n2_xsec_14tev.root");
+  
+  if( !f_c1n2_xsec->IsOpen() ){
+    cout << "Error, could not open c1n2 cross section TFile, quitting" << endl;
+    exit(0);
+  }
+  
+  TH1F* h_c1n2_xsec        = (TH1F*) f_c1n2_xsec->Get("h_c1n2_xsec");
+  
+  if( h_c1n2_xsec == 0 ){
+    cout << "Error, could not retrieve c1n2 cross section hist, quitting" << endl;
+    exit(0);
+  }
+
 
   //--------------------------------------------------------------
   // make an output ntuple
@@ -519,6 +565,10 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
   tree->Branch("jet2phi"    ,  &jet2phi_    ,   "jet2phi/F"	);
   tree->Branch("jet3phi"    ,  &jet3phi_    ,   "jet3phi/F"	);
   tree->Branch("jet4phi"    ,  &jet4phi_    ,   "jet4phi/F"	);
+  tree->Branch("jet1genpt"  ,  &jet1genpt_  ,   "jet1genpt/F"	);
+  tree->Branch("jet2genpt"  ,  &jet2genpt_  ,   "jet2genpt/F"	);
+  tree->Branch("jet3genpt"  ,  &jet3genpt_  ,   "jet3genpt/F"	);
+  tree->Branch("jet4genpt"  ,  &jet4genpt_  ,   "jet4genpt/F"	);
   tree->Branch("bjet1pt"    ,  &bjet1pt_    ,   "bjet1pt/F"	);
   tree->Branch("bjet2pt"    ,  &bjet2pt_    ,   "bjet2pt/F"	);
   tree->Branch("bjet1eta"   ,  &bjet1eta_   ,   "bjet1eta/F"	);
@@ -542,6 +592,7 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
   tree->Branch("drbb"       ,  &drbb_       ,   "drbb/F"	);
   tree->Branch("drbbgen"    ,  &drbbgen_    ,   "drbbgen/F"	);
   tree->Branch("pthgen"     ,  &pthgen_     ,   "pthgen/F"	);
+  tree->Branch("ptc1gen"    ,  &ptc1gen_    ,   "ptc1gen/F"	);
   tree->Branch("lep1pt"     ,  &lep1pt_     ,   "lep1pt/F"	);
   tree->Branch("lep1phi"    ,  &lep1phi_    ,   "lep1phi/F"	);
   tree->Branch("lep1eta"    ,  &lep1eta_    ,   "lep1eta/F"	);
@@ -554,6 +605,12 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
   tree->Branch("leptype"    ,  &leptype_    ,   "leptype/I"	);
   tree->Branch("mchi"       ,  &mchi_       ,   "mchi/I"	);
   tree->Branch("mlsp"       ,  &mlsp_       ,   "mlsp/I"	);
+  tree->Branch("mwgen"      ,  &mwgen_      ,   "mwgen/F"	);
+  tree->Branch("mtwgen"     ,  &mtwgen_     ,   "mtwgen/F"	);
+  tree->Branch("mttgen"     ,  &mttgen_     ,   "mttgen/F"	);
+  tree->Branch("ptttgen"    ,  &ptttgen_    ,   "ptttgen/F"	);
+  tree->Branch("genmet"     ,  &genmet_     ,   "genmet/F"	);
+  tree->Branch("genmetphi"  ,  &genmetphi_  ,   "genmetphi/F"	);
 
   //-----------------------------------------------------------------------
   // Create chain of root trees, add appropriate files
@@ -587,7 +644,7 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
   nevents_ = chain.GetEntries();
 
   weight_  = xsec_ / (float) nevents_;
-  cout << "xsec nevents weight " << xsec_ << " " << nevents_ << " " << weight_ << endl;
+  if (!isSignal) cout << "xsec nevents weight " << xsec_ << " " << nevents_ << " " << weight_ << endl;
 
   mchi_ = -1;
   mlsp_ = -1;
@@ -707,6 +764,13 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
 		<< "   found mchi = " << mchi_string << ", mlsp = " << mlsp_string << std::endl;
       mchi_ = mchi_string.Atoi();
       mlsp_ = mlsp_string.Atoi();
+
+      // xsec stored in pb, mult by 1000 for fb
+      xsec_ = h_c1n2_xsec->GetBinContent(h_c1n2_xsec->FindBin(mchi_)) * 1000. * 0.56 * 0.33;
+      nevents_ = (int) h_nsig->GetBinContent(h_nsig->FindBin(mchi_,mlsp_));
+      weight_  = xsec_ / (float) nevents_;
+      std::cout << "   xsec nevents weight " << xsec_ << " " << nevents_ << " " << weight_ << std::endl;
+
     }
 
     //----------------------------------------
@@ -728,6 +792,13 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
       jet1eta_ = jet->Eta;
       jet1phi_ = jet->Phi;
       histJetPT->Fill(jet1pt_,weight_*stweight_);
+      for( int igjet = 0 ; igjet < branchGenJet->GetEntries() ; igjet++ ){
+	Jet* genjet = (Jet*) branchGenJet->At(igjet);
+	if (genjet->P4().DeltaR(jet->P4()) < 0.4) {
+	  jet1genpt_ = genjet->PT;
+	  break;
+	}
+      }
     }
 
     if(branchJet->GetEntries() > 1){
@@ -735,6 +806,13 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
       jet2pt_  = jet->PT;
       jet2eta_ = jet->Eta;
       jet2phi_ = jet->Phi;
+      for( int igjet = 0 ; igjet < branchGenJet->GetEntries() ; igjet++ ){
+	Jet* genjet = (Jet*) branchGenJet->At(igjet);
+	if (genjet->P4().DeltaR(jet->P4()) < 0.4) {
+	  jet2genpt_ = genjet->PT;
+	  break;
+	}
+      }
     }
 
     if(branchJet->GetEntries() > 2){
@@ -742,6 +820,13 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
       jet3pt_  = jet->PT;
       jet3eta_ = jet->Eta;
       jet3phi_ = jet->Phi;
+      for( int igjet = 0 ; igjet < branchGenJet->GetEntries() ; igjet++ ){
+	Jet* genjet = (Jet*) branchGenJet->At(igjet);
+	if (genjet->P4().DeltaR(jet->P4()) < 0.4) {
+	  jet3genpt_ = genjet->PT;
+	  break;
+	}
+      }
 
     }
 
@@ -750,6 +835,13 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
       jet4pt_  = jet->PT;
       jet4eta_ = jet->Eta;
       jet4phi_ = jet->Phi;
+      for( int igjet = 0 ; igjet < branchGenJet->GetEntries() ; igjet++ ){
+	Jet* genjet = (Jet*) branchGenJet->At(igjet);
+	if (genjet->P4().DeltaR(jet->P4()) < 0.4) {
+	  jet4genpt_ = genjet->PT;
+	  break;
+	}
+      }
     }
 
     //----------------------------------------
@@ -822,6 +914,11 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
     
     int ibgen1 = -1;
     int ibgen2 = -1;
+    int ilepgen1 = -1;
+    int inugen1 = -1;
+    int itgen = -1;
+    int itbargen = -1;
+    TLorentzVector genmetp4;
 
     //cout << endl << endl;
     for( int ip = 0 ; ip < branchParticle->GetEntries() ; ip++ ){
@@ -834,12 +931,33 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
 	nh_++;
 	pthgen_ = p->PT;
       }
-      if( abs( p->PID ) == 24 ) nw_++;
+      if( abs( p->PID ) == 24 ) {
+	nw_++;
+	mwgen_ = p->Mass;
+      }
       if( abs( p->PID ) == 23 ) nz_++;
-      if( abs( p->PID ) ==  6 ) ntop_++;
-      if( abs( p->PID ) == 11 ) ngenels_++;
-      if( abs( p->PID ) == 13 ) ngenmus_++;
+      if( abs( p->PID ) ==  6 ) {
+	ntop_++;
+	if ( p->PID == 6 ) itgen = ip;
+	else if ( p->PID == -6 ) itbargen = ip;
+      }
+      if( abs( p->PID ) == 11 ) {
+	ngenels_++;
+	ilepgen1 = ip;
+      }
+      if( abs( p->PID ) == 13 ) {
+	ngenmus_++;
+	ilepgen1 = ip;
+      }
       if( abs( p->PID ) == 15 ) ngentaus_++;
+      if( abs( p->PID ) == 12 || abs( p->PID ) == 14 || abs( p->PID ) == 16 ) {
+	genmetp4 += p->P4();
+	if( abs( p->PID ) == 12 || abs( p->PID ) == 14 ) {
+	  inugen1 = ip;
+	}
+      }
+      if( abs( p->PID ) == 1000024 ) ptc1gen_ = p->PT;
+      if( abs( p->PID ) == 1000022 ) genmetp4 += p->P4();
 
       if( abs( p->PID ) ==  5 ){
 	nbgen_++;
@@ -850,6 +968,11 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
       //cout << ip << " ID " << p->PID << " status " << p->Status << endl;
     }
 
+    if ( genmetp4.Pt() > 0. ) {
+      genmet_ = genmetp4.Pt();
+      genmetphi_ = genmetp4.Phi();
+    }
+
     if( nbgen_ == 2 ){
       GenParticle* genb1 = (GenParticle*) branchParticle->At(ibgen1);      
       GenParticle* genb2 = (GenParticle*) branchParticle->At(ibgen2);      
@@ -857,6 +980,21 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
       float deta = genb1->Eta - genb2->Eta;
       float dphi = acos( cos ( genb1->Phi - genb2->Phi ) );
       drbbgen_ = sqrt( deta*deta + dphi*dphi );
+    }
+
+    if ( nw_ >= 1 && ilepgen1 > -1 && inugen1 > -1 ) {
+      GenParticle* genlep = (GenParticle*) branchParticle->At(ilepgen1);      
+      GenParticle* gennu = (GenParticle*) branchParticle->At(inugen1);      
+
+      mtwgen_ = sqrt( 2 * gennu->PT * genlep->PT * ( 1 - cos( gennu->Phi - genlep->Phi) ) );
+    }
+
+    if ( itgen > -1 && itbargen > -1 ) {
+      GenParticle* gent = (GenParticle*) branchParticle->At(itgen);      
+      GenParticle* gentbar = (GenParticle*) branchParticle->At(itbargen);      
+
+      mttgen_ = ( (gent->P4()) + (gentbar->P4()) ).M();
+      ptttgen_ = ( (gent->P4()) + (gentbar->P4()) ).Pt();
     }
 
     ngenleps_ = ngenels_ + ngenmus_ + ngentaus_;

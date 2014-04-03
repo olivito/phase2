@@ -44,52 +44,52 @@ void sanityChecker(){
   //char* PU = (char*) "40PileUp";
   //char* PU = (char*) "140PileUp";
 
-  //-------------------------------
-  // diboson filenames and labels
-  //-------------------------------
-
-  const unsigned int n = 5;
-
-  char* names[n] = {Form("BB-4p-0-300-v1510_14TEV_%s_%s_%s"       , phase , config , PU ) ,
-  		    Form("BB-4p-300-700-v1510_14TEV_%s_%s_%s"     , phase , config , PU ) ,
-  		    Form("BB-4p-700-1300-v1510_14TEV_%s_%s_%s"    , phase , config , PU ) ,
-  		    Form("BB-4p-1300-2100-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-  		    Form("BB-4p-2100-100000_14TEV_%s_%s_%s"       , phase , config , PU )  
-  };
-
-  char* labels[n] = {"S*_{T} < 0.3 TeV",
-  		     "S*_{T} 0.3-0.7 TeV",
-  		     "S*_{T} 0.7-1.3 TeV",
-  		     "S*_{T} 1.3-2.1 TeV",
-  		     "S*_{T} > 2.1 TeV"};
-
-  char* filename = "plots/BB-ST.pdf";
-
-
   // //-------------------------------
-  // // boson+jets filenames and labels
+  // // diboson filenames and labels
   // //-------------------------------
 
-  // const unsigned int n = 7;
+  // const unsigned int n = 5;
 
-  // char* names[n] = {Form("Bj-4p-0-300-v1510_14TEV_%s_%s_%s"       , phase , config , PU ) ,
-  // 		    Form("Bj-4p-300-600-v1510_14TEV_%s_%s_%s"     , phase , config , PU ) ,
-  // 		    Form("Bj-4p-600-1100-v1510_14TEV_%s_%s_%s"    , phase , config , PU ) ,
-  // 		    Form("Bj-4p-1100-1800-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-  // 		    Form("Bj-4p-1800-2700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-  // 		    Form("Bj-4p-2700-3700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-  // 		    Form("Bj-4p-3700-100000-v1510_14TEV_%s_%s_%s" , phase , config , PU ) 
+  // char* names[n] = {Form("BB-4p-0-300-v1510_14TEV_%s_%s_%s"       , phase , config , PU ) ,
+  // 		    Form("BB-4p-300-700-v1510_14TEV_%s_%s_%s"     , phase , config , PU ) ,
+  // 		    Form("BB-4p-700-1300-v1510_14TEV_%s_%s_%s"    , phase , config , PU ) ,
+  // 		    Form("BB-4p-1300-2100-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+  // 		    Form("BB-4p-2100-100000_14TEV_%s_%s_%s"       , phase , config , PU )  
   // };
- 
-  // char* labels[n] = {"S*_{T} < 0.3 TeV",
-  // 		     "S*_{T} 0.3-0.6 TeV",
-  // 		     "S*_{T} 0.6-1.1 TeV",
-  // 		     "S*_{T} 1.1-1.8 TeV",
-  // 		     "S*_{T} 1.8-2.7 TeV",
-  // 		     "S*_{T} 2.7-3.7 TeV",
-  // 		     "S*_{T} > 3.7 TeV"};
 
-  // char* filename = "plots/Bj-ST.pdf";
+  // char* labels[n] = {"S*_{T} < 0.3 TeV",
+  // 		     "S*_{T} 0.3-0.7 TeV",
+  // 		     "S*_{T} 0.7-1.3 TeV",
+  // 		     "S*_{T} 1.3-2.1 TeV",
+  // 		     "S*_{T} > 2.1 TeV"};
+
+  // char* filename = "plots/BB-ST.pdf";
+
+
+  //-------------------------------
+  // boson+jets filenames and labels
+  //-------------------------------
+
+  const unsigned int n = 7;
+
+  char* names[n] = {Form("Bj-4p-0-300-v1510_14TEV_%s_%s_%s"       , phase , config , PU ) ,
+  		    Form("Bj-4p-300-600-v1510_14TEV_%s_%s_%s"     , phase , config , PU ) ,
+  		    Form("Bj-4p-600-1100-v1510_14TEV_%s_%s_%s"    , phase , config , PU ) ,
+  		    Form("Bj-4p-1100-1800-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+  		    Form("Bj-4p-1800-2700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+  		    Form("Bj-4p-2700-3700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+  		    Form("Bj-4p-3700-100000-v1510_14TEV_%s_%s_%s" , phase , config , PU ) 
+  };
+ 
+  char* labels[n] = {"S*_{T} < 0.3 TeV",
+  		     "S*_{T} 0.3-0.6 TeV",
+  		     "S*_{T} 0.6-1.1 TeV",
+  		     "S*_{T} 1.1-1.8 TeV",
+  		     "S*_{T} 1.8-2.7 TeV",
+  		     "S*_{T} 2.7-3.7 TeV",
+  		     "S*_{T} > 3.7 TeV"};
+
+  char* filename = "plots/Bj-ST.pdf";
 
 
   // //-------------------------------
