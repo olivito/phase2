@@ -380,11 +380,6 @@ float getCrossSection( const string sample ){
   // else if( TString(sample).Contains("ewkino_WH_500_2000"  ) ) xsec =  0.0051 * 1.3 * 0.56;
   // else if( TString(sample).Contains("ewkino_WH_500_3000"  ) ) xsec =  0.0010 * 1.3 * 0.56;
 
-  // // WZ
-  // else if( TString(sample).Contains("ewkino_WZ_500_1000"  ) ) xsec =  0.0650 * 1.3 * 0.07 * 0.22;
-  // else if( TString(sample).Contains("ewkino_WZ_500_2000"  ) ) xsec =  0.0051 * 1.3 * 0.07 * 0.22;
-  // else if( TString(sample).Contains("ewkino_WZ_500_3000"  ) ) xsec =  0.0010 * 1.3 * 0.07 * 0.22;
-
   cout << "Sample cross section " << xsec << endl;
 
   if( xsec < 0 ){
@@ -552,6 +547,7 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
   tree->Branch("ngentaus"   ,  &ngentaus_   ,   "ngentaus/I"	);
   tree->Branch("ngenleps"   ,  &ngenleps_   ,   "ngenleps/I"	);
   tree->Branch("met"        ,  &met_        ,   "met/F"		);
+  tree->Branch("metphi"     ,  &metphi_     ,   "metphi/F"	);
   tree->Branch("ht"         ,  &ht_         ,   "ht/F"		);
   tree->Branch("jet1pt"     ,  &jet1pt_     ,   "jet1pt/F"	);
   tree->Branch("jet2pt"     ,  &jet2pt_     ,   "jet2pt/F"	);
@@ -893,14 +889,14 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
       Electron* el = (Electron*) branchElectron->At(iel);
       stlep_ += el->PT;
       if( el->PT > 20.0 ) nels_++;
-      //cout << "Electron " << i << el->PT << endl;
+      //      cout << "Electron " << iel << " " << el->PT  << endl;
     }
 
     for( int imu = 0 ; imu < branchMuon->GetEntries() ; imu++ ){
       Muon* mu = (Muon*) branchMuon->At(imu);
       stlep_ += mu->PT;
       if( mu->PT > 20.0 ) nmus_++;
-      //cout << "Muon " << i << mu->PT << endl;
+      //      cout << "Muon " << imu << " " << mu->PT  << endl;
     }
 
     st_ = met_ + ht_ + stlep_;
@@ -1073,193 +1069,6 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
       mt_ = sqrt( 2 * met_ * lep1pt_ * ( 1 - cos( metphi_ - lep1phi_) ) );
     }
 
-    if( nleps_ == 3 ){
-
-      if( nels_ == 2 ){
-	Electron* el1 = (Electron*) branchElectron->At(0);
-	Electron* el2 = (Electron*) branchElectron->At(1);
-
-	dilmass_ = ( (el1->P4()) + (el2->P4()) ).M();
-
-	lep1pt_  = el1->PT;
-	lep1eta_ = el1->Eta;
-	lep1phi_ = el1->Phi;
-
-	lep2pt_  = el2->PT;
-	lep2eta_ = el2->Eta;
-	lep2phi_ = el2->Phi;
-
-	Muon* mu = (Muon*) branchMuon->At(0);
-	lep3pt_  = mu->PT;
-	lep3eta_ = mu->Eta;
-	lep3phi_ = mu->Phi;
-
-	mt_ = sqrt( 2 * met_ * mu->PT * ( 1 - cos( metphi_ - mu->Phi ) ) );
-      }
-
-      else if( nmus_ == 2 ){
-	Muon* mu1 = (Muon*) branchMuon->At(0);
-	Muon* mu2 = (Muon*) branchMuon->At(1);
-
-	dilmass_ = ( (mu1->P4()) + (mu2->P4()) ).M();
-
-	lep1pt_  = mu1->PT;
-	lep1eta_ = mu1->Eta;
-	lep1phi_ = mu1->Phi;
-
-	lep2pt_  = mu2->PT;
-	lep2eta_ = mu2->Eta;
-	lep2phi_ = mu2->Phi;
-
-	Electron* el = (Electron*) branchElectron->At(0);
-	lep3pt_  = el->PT;
-	lep3eta_ = el->Eta;
-	lep3phi_ = el->Phi;
-
-	mt_ = sqrt( 2 * met_ * el->PT * ( 1 - cos( metphi_ - el->Phi ) ) );
-      }
-
-      else if( nels_ == 3 ){
-
-	float diff = 100000;
-	int id3    =     -1;
-
-	for( int i1 = 0 ; i1 < nels_ ; i1++ ){
-	  for( int i2 = i1+1 ; i2 < nels_ ; i2++ ){
-
-	    Electron* el1 = (Electron*) branchElectron->At(i1);
-	    Electron* el2 = (Electron*) branchElectron->At(i2);
-	    
-	    if( el1->Charge * el2->Charge > 0 ) continue;
-	    
-	    if( fabs( ( (el1->P4()) + (el2->P4()) ).M() - 91 ) < diff ){
-
-	      dilmass_ = ( (el1->P4()) + (el2->P4()) ).M();
-	      diff = fabs( dilmass_ - 91.0 );
-
-	      lep1pt_  = el1->PT;
-	      lep1eta_ = el1->Eta;
-	      lep1phi_ = el1->Phi;
-
-	      lep2pt_  = el2->PT;
-	      lep2eta_ = el2->Eta;
-	      lep2phi_ = el2->Phi;
-	      
-	      if( i1 == 0 && i2 == 1 ) id3 = 2;
-	      if( i1 == 0 && i2 == 2 ) id3 = 1;
-	      if( i1 == 1 && i2 == 2 ) id3 = 0;
-	    }
-	  }
-	}
-
-	if( id3 < 0 ){
-	  cout << "ERROR! couldn't find 3rd lepton, skipping event" << endl;
-	  continue;
-	}
-
-	Electron* el3 = (Electron*) branchElectron->At(id3);      
-	lep3pt_  = el3->PT;
-	lep3eta_ = el3->Eta;
-	lep3phi_ = el3->Phi;
-
-	mt_ = sqrt( 2 * met_ * el3->PT * ( 1 - cos( metphi_ - el3->Phi ) ) );
-      }
-
-      else if( nmus_ == 3 ){
-
-	float diff = 100000;
-	int id3    =     -1;
-
-	for( int i1 = 0 ; i1 < nmus_ ; i1++ ){
-	  for( int i2 = i1+1 ; i2 < nmus_ ; i2++ ){
-
-	    Muon* mu1 = (Muon*) branchMuon->At(i1);
-	    Muon* mu2 = (Muon*) branchMuon->At(i2);
-	    
-	    if( mu1->Charge * mu2->Charge > 0 ) continue;
-	    
-	    if( fabs( ( (mu1->P4()) + (mu2->P4()) ).M() - 91 ) < diff ){
-
-	      dilmass_ = ( (mu1->P4()) + (mu2->P4()) ).M();
-	      diff = fabs( dilmass_ - 91.0 );
-
-	      lep1pt_  = mu1->PT;
-	      lep1eta_ = mu1->Eta;
-	      lep1phi_ = mu1->Phi;
-
-	      lep2pt_  = mu2->PT;
-	      lep2eta_ = mu2->Eta;
-	      lep2phi_ = mu2->Phi;
-	      
-	      if( i1 == 0 && i2 == 1 ) id3 = 2;
-	      if( i1 == 0 && i2 == 2 ) id3 = 1;
-	      if( i1 == 1 && i2 == 2 ) id3 = 0;
-	    }
-	  }
-	}
-
-	if( id3 < 0 ){
-	  cout << "ERROR! couldn't find 3rd lepton, skipping event" << endl;
-	  continue;
-	}
-
-	Muon* mu3 = (Muon*) branchMuon->At(id3);      
-	lep3pt_  = mu3->PT;
-	lep3eta_ = mu3->Eta;
-	lep3phi_ = mu3->Phi;
-
-	mt_ = sqrt( 2 * met_ * mu3->PT * ( 1 - cos( metphi_ - mu3->Phi ) ) );
-
-      }
-
-      else{
-	cout << "ERROR! nleps nels nmus " << nleps_ << " " << nels_ << " " << nmus_ << endl;
-      }
-
-      // for( int imu = 0 ; imu < branchMuon->GetEntries() ; imu++ ){
-      // 	Muon* mu = (Muon*) branchMuon->At(imu);
-
-      // }
-
-
-
-
-
-
-    }
-
-
-    // leptype_ = -1;
-    // float maxleppt = -1.0;
-
-    // cout << "Electrons " << endl;
-    // for( int iel = 0 ; iel < nels_ ; iel++ ){
-    //   Electron* el = (Electron *) branchElectron->At(iel);
-    //   cout << iel << " " << el->PT << endl;
-    // }
-
-    // cout << "Muons " << endl;
-    // for( int imu = 0 ; imu < nmus_ ; imu++ ){
-    //   Muon* mu = (Muon *) branchMuon->At(imu);
-    //   cout << imu << " " << mu->PT << endl;
-    // }
-
-
-    //}
-
-
-    // Electron *elec1, *elec2;
-
-    // // If event contains at least 2 electrons
-    // if(branchElectron->GetEntries() > 1){
-    //   // Take first two electrons
-    //   elec1 = (Electron *) branchElectron->At(0);
-    //   elec2 = (Electron *) branchElectron->At(1);
-      
-    //   // Plot their invariant mass
-    //   histMass->Fill(((elec1->P4()) + (elec2->P4())).M());
-    // }
-    
     tree->Fill();
 
   } // end loop over events in chain
