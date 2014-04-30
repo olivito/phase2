@@ -32,8 +32,8 @@
 #include "simpleLooper.h"
 
 
-//char* version = (char*) "V00-00-02";
-char* version = (char*) "temp";
+char* version = (char*) "V00-00-05";
+//char* version = (char*) "temp";
 
 using namespace std;
 
@@ -187,6 +187,10 @@ void simpleLooper(char* sample, char* phase, char* config, char* PU, int stbin =
     else{
       cout << "Error, unrecognized bin " << stbin << endl;
     }
+  }
+
+  else if( tsample.Contains("TChiWHTest") ){
+    doLoop( Form("TChiWH14PythiaTest_%s_%s_%s"       , phase , config , PU ) , nfiles, true );
   }
 
   else if( tsample.Contains("TChiWH") ){
@@ -400,6 +404,11 @@ void InitVars(){
   njets50_  = 0  ;
   njets100_ = 0  ;
   ngenjets_ = 0  ;
+  njetsfwd_    = 0  ;
+  njetsfwd40_  = 0  ;
+  njetsfwd50_  = 0  ;
+  njetsfwd100_ = 0  ;
+  ngenjetsfwd_ = 0  ;
   nels_     = 0  ;
   nmus_     = 0  ;
   nleps_    = 0  ; 
@@ -456,9 +465,6 @@ void InitVars(){
   lep2pt_   = 0. ;
   lep2eta_  = 0. ;
   lep2phi_  = 0. ;
-  lep3pt_   = 0. ;
-  lep3eta_  = 0. ;
-  lep3phi_  = 0. ;
   leptype_  = -1 ;
   // mchi_     = -1 ;
   // mlsp_     = -1 ;
@@ -539,6 +545,11 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
   tree->Branch("njets50"    ,  &njets50_    ,   "njets50/I"	);
   tree->Branch("njets100"   ,  &njets100_   ,   "njets100/I"	);
   tree->Branch("ngenjets"   ,  &ngenjets_   ,   "ngenjets/I"	);
+  tree->Branch("njetsfwd"   ,  &njetsfwd_   ,   "njetsfwd/I"	);
+  tree->Branch("njetsfwd40" ,  &njetsfwd40_ ,   "njetsfwd40/I"	);
+  tree->Branch("njetsfwd50" ,  &njetsfwd50_ ,   "njetsfwd50/I"	);
+  tree->Branch("njetsfwd100",  &njetsfwd100_,   "njetsfwd100/I"	);
+  tree->Branch("ngenjetsfwd",  &ngenjetsfwd_,   "ngenjetsfwd/I"	);
   tree->Branch("nels"       ,  &nels_       ,   "nels/I"	);
   tree->Branch("nmus"       ,  &nmus_       ,   "nmus/I"	);
   tree->Branch("nleps"      ,  &nleps_      ,   "nleps/I"	);
@@ -595,9 +606,6 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
   tree->Branch("lep2pt"     ,  &lep2pt_     ,   "lep2pt/F"	);
   tree->Branch("lep2phi"    ,  &lep2phi_    ,   "lep2phi/F"	);
   tree->Branch("lep2eta"    ,  &lep2eta_    ,   "lep2eta/F"	);
-  tree->Branch("lep3pt"     ,  &lep3pt_     ,   "lep3pt/F"	);
-  tree->Branch("lep3phi"    ,  &lep3phi_    ,   "lep3phi/F"	);
-  tree->Branch("lep3eta"    ,  &lep3eta_    ,   "lep3eta/F"	);
   tree->Branch("leptype"    ,  &leptype_    ,   "leptype/I"	);
   tree->Branch("mchi"       ,  &mchi_       ,   "mchi/I"	);
   tree->Branch("mlsp"       ,  &mlsp_       ,   "mlsp/I"	);
@@ -847,10 +855,18 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
     for( int ijet = 0 ; ijet < branchJet->GetEntries() ; ijet++ ){
       Jet* jet = (Jet*) branchJet->At(ijet);
       //cout << i << " " << Form("%.1f",jet->PT) << " " << Form("%.2f",jet->Eta) << endl;
-      if( jet->PT > 30  ) njets_++;
-      if( jet->PT > 40  ) njets40_++;
-      if( jet->PT > 50  ) njets50_++;
-      if( jet->PT > 100 ) njets100_++;
+      if ( abs(jet->Eta) < 2.4 ) {
+	if( jet->PT > 30  ) njets_++;
+	if( jet->PT > 40  ) njets40_++;
+	if( jet->PT > 50  ) njets50_++;
+	if( jet->PT > 100 ) njets100_++;
+      }
+      else {
+	if( jet->PT > 30  ) njetsfwd_++;
+	if( jet->PT > 40  ) njetsfwd40_++;
+	if( jet->PT > 50  ) njetsfwd50_++;
+	if( jet->PT > 100 ) njetsfwd100_++;
+      }
     }
 
     histNjets->Fill(njets_,weight_*stweight_);
@@ -862,7 +878,12 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
     for( int igjet = 0 ; igjet < branchGenJet->GetEntries() ; igjet++ ){
       Jet* genjet = (Jet*) branchGenJet->At(igjet);
       //cout << i << " " << Form("%.1f",jet->PT) << " " << Form("%.2f",jet->Eta) << endl;
-      if( genjet->PT > 30 ) ngenjets_++;
+      if ( abs(genjet->Eta) < 2.4 ) {
+	if( genjet->PT > 30 ) ngenjets_++;
+      }
+      else {
+	if( genjet->PT > 30 ) ngenjetsfwd_++;
+      }
     }
     
     //----------------------------------------
@@ -871,6 +892,7 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
 
     MissingET* met = (MissingET*) branchMissingET->At(0);
     met_ = met->MET;
+    metphi_ = met->Phi;
     histMet->Fill(met_,weight_*stweight_);
 
     //----------------------------------------
@@ -888,14 +910,14 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
     for( int iel = 0 ; iel < branchElectron->GetEntries() ; iel++ ){
       Electron* el = (Electron*) branchElectron->At(iel);
       stlep_ += el->PT;
-      if( el->PT > 20.0 ) nels_++;
+      if( el->PT > 10.0 ) nels_++;
       //      cout << "Electron " << iel << " " << el->PT  << endl;
     }
 
     for( int imu = 0 ; imu < branchMuon->GetEntries() ; imu++ ){
       Muon* mu = (Muon*) branchMuon->At(imu);
       stlep_ += mu->PT;
-      if( mu->PT > 20.0 ) nmus_++;
+      if( mu->PT > 10.0 ) nmus_++;
       //      cout << "Muon " << imu << " " << mu->PT  << endl;
     }
 
@@ -1039,8 +1061,6 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
       bjet2phi_ = bjet2->Phi;
     }
 
-    //nels_  = branchElectron->GetEntries();
-    //nmus_  = branchMuon->GetEntries();
     nleps_ = nels_ + nmus_;
 
     if( nleps_ == 1 ){
@@ -1062,12 +1082,73 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
       }
       
       else{ 
-	cout << "Couldn't find lepton!" << endl;
+	cout << "Couldn't find lepton in 1lep event!" << endl;
 	exit(0);
       }
 
-      mt_ = sqrt( 2 * met_ * lep1pt_ * ( 1 - cos( metphi_ - lep1phi_) ) );
-    }
+    } // nleps == 1
+
+    else if( nleps_ == 2 ){
+
+      if( nels_ == 2 ){
+	Electron* el1 = (Electron *) branchElectron->At(0);
+	leptype_ = 0;
+	lep1pt_  = el1->PT;
+	lep1eta_ = el1->Eta;
+	lep1phi_ = el1->Phi;
+
+	Electron* el2 = (Electron *) branchElectron->At(1);
+	lep2pt_  = el2->PT;
+	lep2eta_ = el2->Eta;
+	lep2phi_ = el2->Phi;
+      } // ee
+
+      else if( nmus_ == 2 ){
+	Muon* mu1 = (Muon *) branchMuon->At(0);
+	leptype_ = 1;
+	lep1pt_  = mu1->PT;
+	lep1eta_ = mu1->Eta;
+	lep1phi_ = mu1->Phi;
+
+	Muon* mu2 = (Muon *) branchMuon->At(1);
+	lep2pt_  = mu2->PT;
+	lep2eta_ = mu2->Eta;
+	lep2phi_ = mu2->Phi;
+      } // mumu
+      
+      else if( (nels_ == 1) && (nmus_ == 1) ){
+	Electron* el = (Electron *) branchElectron->At(0);
+	Muon* mu = (Muon *) branchMuon->At(0);
+
+	if (el->PT > mu->PT) {
+	  leptype_ = 0;
+	  lep1pt_  = el->PT;
+	  lep1eta_ = el->Eta;
+	  lep1phi_ = el->Phi;
+
+	  lep2pt_  = mu->PT;
+	  lep2eta_ = mu->Eta;
+	  lep2phi_ = mu->Phi;
+	} else {
+	  leptype_ = 1;
+	  lep1pt_  = mu->PT;
+	  lep1eta_ = mu->Eta;
+	  lep1phi_ = mu->Phi;
+
+	  lep2pt_  = el->PT;
+	  lep2eta_ = el->Eta;
+	  lep2phi_ = el->Phi;
+	}
+      } // emu
+      
+      else{ 
+	cout << "Couldn't find leptons in 2lep event!" << endl;
+	exit(0);
+      }
+
+    } // nleps == 2
+
+    mt_ = sqrt( 2 * met_ * lep1pt_ * ( 1 - cos( metphi_ - lep1phi_) ) );
 
     tree->Fill();
 
