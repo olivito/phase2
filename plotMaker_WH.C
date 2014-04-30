@@ -72,7 +72,7 @@ void makePlot( vector<TChain*> samples , vector<string> names , char* var , char
     h[i]->SetFillColor(colors[i]);
     Double_t yield, err;
     yield = h[i]->IntegralAndError(0,-1,err);
-    cout << "Yield " << names.at(i) << " " << yield << " $\\pm$ " << err << endl;
+    cout << "Yield " << names.at(i) << " " << Form("%.0f $\\pm$ %.0f",yield,err) << endl; //<< yield << " $\\pm$ " << err << endl;
     //cout << "Bin3     " << names.at(i) << " " << h[i]->GetBinContent(3) << " +/- " << h[i]->GetBinError(3) << endl;
     t->Add(h[i]);
     nbkg++;
@@ -90,7 +90,7 @@ void makePlot( vector<TChain*> samples , vector<string> names , char* var , char
 
   Double_t nbgtot, errbgtot;
   nbgtot = bkgtot->IntegralAndError(0,-1,errbgtot);
-  cout << "Yield Total Bg: " << nbgtot << " $\\pm$ " << errbgtot << endl;
+  cout << "Yield Total Bg: " << Form("%.0f $\\pm$ %.0f",nbgtot,errbgtot) << endl; //nbgtot << " $\\pm$ " << errbgtot << endl;
 
   for( unsigned int i = 0 ; i < n ; i++ ){
     if( !TString(names.at(i)).Contains("sig") ) continue;
@@ -104,7 +104,7 @@ void makePlot( vector<TChain*> samples , vector<string> names , char* var , char
       samples.at(i)->Draw(Form("min(%s,%f)>>hist_%s_%d_%d_%s",var,xmax-0.0001,names.at(i).c_str(),mchi,mlsp,var),sig_sel*weight);
       Double_t yield, err;
       yield = hsig[j]->IntegralAndError(0,-1,err);
-      cout << "Yield " << names.at(i) << " (" << mchi << "," << mlsp << ") " << yield << " $\\pm$ " << err
+      cout << "Yield " << names.at(i) << " (" << mchi << "," << mlsp << ") " << Form("%.0f $\\pm$ %.0f",yield,err)
 	   << ", S/sqrt(B): " << yield/sqrt(nbgtot) 
 	   << ", sig (syst of " << bg_syst1 << "): " << yield/sqrt(nbgtot + (bg_syst1**2)*(nbgtot**2))
 	   << ", sig (syst of " << bg_syst2 << "): " << yield/sqrt(nbgtot + (bg_syst2**2)*(nbgtot**2)) << endl;
@@ -139,14 +139,13 @@ void makePlot( vector<TChain*> samples , vector<string> names , char* var , char
 void plotMaker_WH(){
 
   //char* version = (char*) "V00-00-01";
-  char* version = (char*) "V00-00-02";
+  char* version = (char*) "V00-00-05";
 
   char* phase = (char*) "PhaseI";
 
   char* config = (char*) "Configuration0";
 
   char* PU = (char*) "NoPileUp";
-  //char* PU = (char*) "40PileUp";
   //char* PU = (char*) "140PileUp";
 
   char* filter = "skim_1lpt30_2b";
@@ -242,7 +241,7 @@ void plotMaker_WH(){
   // TChain* WH2 = new TChain("t");
   // TChain* WH3 = new TChain("t");
 
-  chWH->Add(Form("output/%s/%s/TChiWH*_%s_%s_%s_baby.root"       , version, filter , phase , config , PU ) );
+  chWH->Add(Form("output/%s/%s/TChiWH14Pythia_%s_%s_%s_baby.root"       , version, filter , phase , config , PU ) );
 
   cout << "TChiWH entries " << chWH->GetEntries() << endl;
 
@@ -272,8 +271,10 @@ void plotMaker_WH(){
   TCut ptlep50("lep1pt>50");
   TCut ptlep100("lep1pt>100");
   TCut nb2("nb==2");
+  TCut nb2cent("nb==2 && abs(bjet1eta) < 2.4 && abs(bjet2eta) < 2.4");
   TCut nj2("njets==2");
   TCut nj23("njets==2 || njets==3");
+  TCut nj0fwd("njetsfwd==0");
   TCut mt100("mt > 100.0");
   TCut mt200("mt > 200.0");
   TCut mt300("mt > 300.0");
@@ -281,7 +282,13 @@ void plotMaker_WH(){
   TCut mt600("mt > 600.0");
   TCut met50("met > 50.0");
   TCut met100("met > 100.0");
+  TCut met175("met > 175.0");
+  TCut met200("met > 200.0");
   TCut met300("met > 300.0");
+  TCut met400("met > 400.0");
+  TCut metlt200("met <= 200.0");
+  TCut metlt300("met <= 300.0");
+  TCut metlt400("met <= 400.0");
   TCut met500("met > 500.0");
   TCut met600("met > 600.0");
   TCut met700("met > 700.0");
@@ -299,93 +306,35 @@ void plotMaker_WH(){
   // TCut drlj3("sqrt( pow(lep1eta-jet3eta,2) + pow(acos(cos(lep1phi-jet3phi)) ,2) ) > 0.4");
   // TCut drlj4("sqrt( pow(lep1eta-jet4eta,2) + pow(acos(cos(lep1phi-jet4phi)) ,2) ) > 0.4");
 
-  TCut sel;
-
-  //---------------------
-  // 1-lepton selection
-  //---------------------
-
-  sel += nj23;
-  sel += nlep1;
-  sel += ptlep100;
-  sel += nb2;
-  sel += mt300;
-  // sel += mt500;
-  sel += met500;
-  //sel += met700;
-  sel += st1000;
-  // sel += drlj1;
-  // sel += drlj2;
-  // sel += drlj3;
-  // sel += drlj4;
-
-  //sel += mbb;  
-  //sel += nj2;
-
-
-  //---------------------
-  // 3-lepton selection
-  //---------------------
-  /*
-  sel += nlep3;
-  sel += TCut("lep1pt > 100.0");
-  sel += TCut("lep2pt >  50.0");
-  sel += TCut("lep3pt >  50.0");
-  sel += TCut("dilmass>81 && dilmass<101.0");
-  sel += mt300;
-  */
-  // makePlot( samples , names , (char*)"mt"  , sel , weight , 50 , 0 , 1000 );
-  // makePlot( samples , names , (char*)"met" , TCut(sel+mt200) , weight , 50 , 0 , 1000 );
-  // makePlot( samples , names , (char*)"st"  , sel , weight , 50 , 0 , 5000 );
-  // makePlot( samples , names , (char*)"njets"  , sel , weight , 10 , 0 , 10 );
-  // makePlot( samples , names , (char*)"mbb" , TCut(nlep1+nb2+mt300+met500+st1000+jet1pt100+jet2pt50+jet3pt50) , weight , 16 , 0 , 400 );
-  //
-
-  //makePlot( samples , names , (char*)"met" , sel , weight , 20 , 0 , 600 );
-
   //------------------------------
-  // 1st iteration
+  // plot selection
   //------------------------------
 
-  //TCut presel = nlep1 + ptlep30 + nb2 + mbb;
-  //TCut presel = nlep1 + ptlep30 + nb2;
-
-  // makePlot( samples , names , (char*)"st"     , (char*) "S_{T} [GeV]" , presel              , weight , 60 , 0 , 3000 , true );
-  // makePlot( samples , names , (char*)"njets"  , (char*) "N_{jets}"    , TCut(presel+st1000) , weight , 10 , 0 , 10 , true );
-  // makePlot( samples , names , (char*)"lep1pt"  , (char*) "lepton p_{T} [GeV]"    , TCut(presel+st1000+nj23) , weight , 10 , 0 , 500 , true );
-  // makePlot( samples , names , (char*)"mt"  , (char*) "M_{T} [GeV]"    , TCut(presel+st1000+nj23+ptlep100) , weight , 10 , 0 , 1000 , true );
-  // makePlot( samples , names , (char*)"met"  , (char*) "E_{T}^{miss} [GeV]"    , TCut(presel+st1000+nj23+ptlep100+mt600) , weight , 10 , 0 , 1000 , true );
-  // makePlot( samples , names , (char*)"mbb"  , (char*) "M_{bb} [GeV]"    , TCut(nlep1+ptlep30+nb2+st1000+nj23+ptlep100+mt600+met600) , weight , 10 , 0 , 500 , true , false );
-
-  //------------------------------
-  // 2nd iteration
-  //------------------------------
-
-  TCut presel = nlep1 + ptlep30 + nb2 + met50;
+  TCut presel = nlep1 + ptlep30 + nb2cent + met50 + mbb90;
   //  TCut presel = nlep1 + ptlep30 + nb2 + met50 + mbb90;
-  TCut presel2 = presel + met100 + mt100 + nj2 + mct160;
-  TCut presel3 = presel2 + st750 + met300;// + mct160 + mt300;
+  TCut sigsel = presel + nj2 + mt100 + mct160 + met100;
+  //  TCut presel3 = presel2 + st750 + met300;// + mct160 + mt300;
   //TCut presel = nlep1 + ptlep30 + nb2;
+
+  //  TCut plotsel = presel;
+  TCut plotsel = sigsel;
 
   bool printplots = true;
 
-  std::cout << "cuts: " << presel.GetTitle() << std::endl;
+  std::cout << "cuts: " << plotsel.GetTitle() << std::endl;
 
-  makePlot( samples , names , (char*)"st"     , (char*) "S_{T} [GeV]" , TCut(presel)              , weight , 60 , 0 , 3000 , sig_mchi , sig_mlsp , printplots );
-  // makePlot( samples , names , (char*)"lep1pt"   , (char*) "lepton p_{T} [GeV]" , TCut(presel2)              , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
-  // makePlot( samples , names , (char*)"bjet1pt"   , (char*) "leading b-jet p_{T} [GeV]" , TCut(presel2)              , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
-  // makePlot( samples , names , (char*)"njets"  , (char*) "N_{jets}"    , TCut(presel2) , weight , 10 , 0 , 10 , sig_mchi , sig_mlsp , printplots );
-  // makePlot( samples , names , (char*)"mt"  , (char*) "M_{T} [GeV]"    , TCut(presel2) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
-  // makePlot( samples , names , (char*)"met"  , (char*) "E_{T}^{miss} [GeV]"    , TCut(presel2) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
-  // makePlot( samples , names , (char*)"mct"  , (char*) "M_{CT} [GeV]"    , TCut(presel2) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
-  // makePlot( samples , names , (char*)"mbb"  , (char*) "M_{bb} [GeV]"    , TCut(nlep1 + ptlep30 + nb2 + met100 + mt100 + nj23 + mct160) , weight , 50 , 0 , 500 , sig_mchi , sig_mlsp , printplots , false );
+  // makePlot( samples , names , (char*)"njets"  , (char*) "N_{jets}, pt > 30"    , TCut(plotsel) , weight , 10 , 0 , 10 , sig_mchi , sig_mlsp , printplots );
+  // makePlot( samples , names , (char*)"njets40"  , (char*) "N_{jets}, pt > 40"    , TCut(plotsel) , weight , 10 , 0 , 10 , sig_mchi , sig_mlsp , printplots );
+  // makePlot( samples , names , (char*)"njetsfwd"  , (char*) "N_{fwd jets}, pt > 30"    , TCut(plotsel) , weight , 10 , 0 , 10 , sig_mchi , sig_mlsp , printplots );
+  // makePlot( samples , names , (char*)"njetsfwd40"  , (char*) "N_{fwd jets}, pt > 40"    , TCut(plotsel) , weight , 10 , 0 , 10 , sig_mchi , sig_mlsp , printplots );
 
-
-
-  //makePlot( samples , names , (char*)"mbb"  , (char*) "M_{bb} [GeV]"    , TCut(nlep1+ptlep30+nb2+st1000+nj23+ptlep100+mt600+met700) , weight , 10 , 0 , 500 , true , false );
-
-
-  //makePlot( samples , names , (char*)"mbb" , sel , weight , 16 , 0 , 400 );
-
+  // makePlot( samples , names , (char*)"st"     , (char*) "S_{T} [GeV]" , TCut(plotsel)              , weight , 60 , 0 , 3000 , sig_mchi , sig_mlsp , printplots );
+  makePlot( samples , names , (char*)"lep1pt"   , (char*) "lepton p_{T} [GeV]" , TCut(plotsel)              , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
+  // makePlot( samples , names , (char*)"bjet1pt"   , (char*) "leading b-jet p_{T} [GeV]" , TCut(plotsel)              , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
+  // makePlot( samples , names , (char*)"met"  , (char*) "E_{T}^{miss} [GeV]"    , TCut(plotsel) , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
+  // makePlot( samples , names , (char*)"mt"  , (char*) "M_{T} [GeV]"    , TCut(plotsel) , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
+  // makePlot( samples , names , (char*)"mct"  , (char*) "M_{CT} [GeV]"    , TCut(plotsel) , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
+  // makePlot( samples , names , (char*)"ptbb" , (char*) "p_{T}(bb) [GeV]" , TCut(plotsel) , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
+  //  makePlot( samples , names , (char*)"mbb"  , (char*) "M_{bb} [GeV]"    , TCut(nlep1 + ptlep30 + nb2cent + met50) , weight , 50 , 0 , 500 , sig_mchi , sig_mlsp , printplots , false );
 
 }
