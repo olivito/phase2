@@ -32,8 +32,8 @@
 #include "simpleLooper.h"
 
 
-char* version = (char*) "V00-00-05";
-//char* version = (char*) "temp";
+//char* version = (char*) "V00-00-06";
+char* version = (char*) "temp";
 
 using namespace std;
 
@@ -441,6 +441,16 @@ void InitVars(){
   jet4eta_  = 0. ;
   jet4phi_  = 0. ;
   jet4genpt_= -1.;
+  genjetb1pt_   = -1.;
+  genjetb1eta_  = 0. ;
+  genjetb1phi_  = 0. ;
+  genjetb1recopt_= -1.;
+  genjetb1tag_  = -1 ;
+  genjetb2pt_   = -1.;
+  genjetb2eta_  = 0. ;
+  genjetb2phi_  = 0. ;
+  genjetb2recopt_= -1.;
+  genjetb2tag_  = -1 ;
   st_       = 0. ;
   stlep_    = 0. ;
   stweight_ = 0. ;
@@ -459,6 +469,10 @@ void InitVars(){
   drbbgen_  = 0  ;
   pthgen_   = 0  ;
   ptc1gen_  = 0  ;
+  genb1pt_  = -1.;
+  genb1eta_ = 0. ;
+  genb2pt_  = -1.;
+  genb2eta_ = 0. ;
   lep1pt_   = 0. ;
   lep1eta_  = 0. ;
   lep1phi_  = 0. ;
@@ -582,6 +596,16 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
   tree->Branch("bjet2eta"   ,  &bjet2eta_   ,   "bjet2eta/F"	);
   tree->Branch("bjet1phi"   ,  &bjet1phi_   ,   "bjet1phi/F"	);
   tree->Branch("bjet2phi"   ,  &bjet2phi_   ,   "bjet2phi/F"	);
+  tree->Branch("genjetb1pt"     ,  &genjetb1pt_     ,   "genjetb1pt/F"	);
+  tree->Branch("genjetb2pt"     ,  &genjetb2pt_     ,   "genjetb2pt/F"	);
+  tree->Branch("genjetb1eta"    ,  &genjetb1eta_    ,   "genjetb1eta/F"	);
+  tree->Branch("genjetb2eta"    ,  &genjetb2eta_    ,   "genjetb2eta/F"	);
+  tree->Branch("genjetb1phi"    ,  &genjetb1phi_    ,   "genjetb1phi/F"	);
+  tree->Branch("genjetb2phi"    ,  &genjetb2phi_    ,   "genjetb2phi/F"	);
+  tree->Branch("genjetb1recopt"  ,  &genjetb1recopt_  ,   "genjetb1recopt/F"	);
+  tree->Branch("genjetb2recopt"  ,  &genjetb2recopt_  ,   "genjetb2recopt/F"	);
+  tree->Branch("genjetb1tag"    ,  &genjetb1tag_    ,   "genjetb1tag/I"	);
+  tree->Branch("genjetb2tag"    ,  &genjetb2tag_    ,   "genjetb2tag/I"	);
   tree->Branch("st"         ,  &st_         ,   "st/F"		);
   tree->Branch("stlep"      ,  &stlep_      ,   "stlep/F"	);
   tree->Branch("stweight"   ,  &stweight_   ,   "stweight/F"	);
@@ -600,6 +624,10 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
   tree->Branch("drbbgen"    ,  &drbbgen_    ,   "drbbgen/F"	);
   tree->Branch("pthgen"     ,  &pthgen_     ,   "pthgen/F"	);
   tree->Branch("ptc1gen"    ,  &ptc1gen_    ,   "ptc1gen/F"	);
+  tree->Branch("genb1pt"    ,  &genb1pt_    ,   "genb1pt/F"	);
+  tree->Branch("genb1eta"   ,  &genb1eta_   ,   "genb1eta/F"	);
+  tree->Branch("genb2pt"    ,  &genb2pt_    ,   "genb2pt/F"	);
+  tree->Branch("genb2eta"   ,  &genb2eta_   ,   "genb2eta/F"	);
   tree->Branch("lep1pt"     ,  &lep1pt_     ,   "lep1pt/F"	);
   tree->Branch("lep1phi"    ,  &lep1phi_    ,   "lep1phi/F"	);
   tree->Branch("lep1eta"    ,  &lep1eta_    ,   "lep1eta/F"	);
@@ -942,6 +970,8 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
     for( int ip = 0 ; ip < branchParticle->GetEntries() ; ip++ ){
       GenParticle* p = (GenParticle*) branchParticle->At(ip);
 
+      if ( isSignal && p->Status != 3 ) continue;
+
       // -- not sure what this is about..
       // if( isSignal && ( p->Status < 20 || p->Status > 30 ) ) continue;
 
@@ -995,11 +1025,66 @@ void doLoop(const string prefix, int nfiles , bool isSignal){
       GenParticle* genb1 = (GenParticle*) branchParticle->At(ibgen1);      
       GenParticle* genb2 = (GenParticle*) branchParticle->At(ibgen2);      
 
+      if (genb1->PT > genb2->PT) {
+	genb1pt_ = genb1->PT;
+	genb1eta_ = genb1->Eta;
+	genb2pt_ = genb2->PT;
+	genb2eta_ = genb2->Eta;
+      } else {
+	genb1pt_ = genb2->PT;
+	genb1eta_ = genb2->Eta;
+	genb2pt_ = genb1->PT;
+	genb2eta_ = genb1->Eta;
+      }
+
       float deta = genb1->Eta - genb2->Eta;
       float dphi = acos( cos ( genb1->Phi - genb2->Phi ) );
       drbbgen_ = sqrt( deta*deta + dphi*dphi );
-    }
 
+      // loop over gen jets and find matching jets
+      int ib1 = -1;
+      int ib2 = -1;
+      for( int igjet = 0 ; igjet < branchGenJet->GetEntries() ; igjet++ ){
+	Jet* genjet = (Jet*) branchGenJet->At(igjet);
+	float drb1 = genb1->P4().DeltaR(genjet->P4()); 
+	float drb2 = genb2->P4().DeltaR(genjet->P4()); 
+	if ((drb1 < 0.5) || (drb2 < 0.5)) {
+	  if     ( ib1 < 0 ) ib1 = igjet;
+	  else if( ib2 < 0 ) ib2 = igjet;
+	}
+      } // gen jet loop
+
+      if (ib1 >= 0) {
+	Jet* genjet = (Jet*) branchGenJet->At(ib1);
+	genjetb1pt_  = genjet->PT;
+	genjetb1eta_ = genjet->Eta;
+	genjetb1phi_ = genjet->Phi;
+	for( int ijet = 0 ; ijet < branchJet->GetEntries() ; ijet++ ){
+	  Jet* jet = (Jet*) branchJet->At(ijet);
+	  if (genjet->P4().DeltaR(jet->P4()) < 0.5) {
+	    genjetb1recopt_ = jet->PT;
+	    genjetb1tag_ = ( jet->BTag & (1 << 1) ) ? 1 : 0;
+	    break;
+	  }
+	} // reco jet loop
+      } // gen jet 1
+
+      if (ib2 >= 0) {
+	Jet* genjet = (Jet*) branchGenJet->At(ib2);
+	genjetb2pt_  = genjet->PT;
+	genjetb2eta_ = genjet->Eta;
+	genjetb2phi_ = genjet->Phi;
+	for( int ijet = 0 ; ijet < branchJet->GetEntries() ; ijet++ ){
+	  Jet* jet = (Jet*) branchJet->At(ijet);
+	  if (genjet->P4().DeltaR(jet->P4()) < 0.5) {
+	    genjetb2recopt_ = jet->PT;
+	    genjetb2tag_ = ( jet->BTag & (1 << 1) ) ? 1 : 0;
+	    break;
+	  }
+	} // reco jet loop
+      } // gen jet 2
+    } // 2 gen b
+ 
     if ( nw_ >= 1 && ilepgen1 > -1 && inugen1 > -1 ) {
       GenParticle* genlep = (GenParticle*) branchParticle->At(ilepgen1);      
       GenParticle* gennu = (GenParticle*) branchParticle->At(inugen1);      
