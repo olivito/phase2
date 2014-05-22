@@ -29,20 +29,22 @@ using namespace std;
 void sanityChecker(){
 
   int rebin = 10;
-  //  char* version = "V00-00-02";
-  char* version = "temp";
+  char* version = "V00-00-05";
+  //char* version = "temp";
 
   //-------------------------------
   // choose config/PU scenario
   //-------------------------------
 
-  char* phase = (char*) "PhaseI";
+  //char* phase = (char*) "PhaseI";
+  char* phase = (char*) "PhaseII";
 
-  char* config = (char*) "Configuration0";
+  //char* config = (char*) "Configuration0";
+  char* config = (char*) "Configuration4v2";
 
-  char* PU = (char*) "NoPileUp";
+  //char* PU = (char*) "NoPileUp";
   //char* PU = (char*) "40PileUp";
-  //char* PU = (char*) "140PileUp";
+  char* PU = (char*) "140PileUp";
 
   // //-------------------------------
   // // diboson filenames and labels
@@ -92,27 +94,27 @@ void sanityChecker(){
   char* filename = "plots/Bj-ST.pdf";
 
 
-  // //-------------------------------
-  // // ttbar filenames and labels
-  // //-------------------------------
+//   //-------------------------------
+//   // ttbar filenames and labels
+//   //-------------------------------
 
-  // const unsigned int n = 5;
+//   const unsigned int n = 5;
 
-  // char* names[n] = {Form("tt-4p-0-600-v1510_14TEV_%s_%s_%s"       , phase , config , PU ) ,
-  // 		    Form("tt-4p-600-1100-v1510_14TEV_%s_%s_%s"    , phase , config , PU ) ,
-  // 		    Form("tt-4p-1100-1700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-  // 		    Form("tt-4p-1700-2500-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-  // 		    Form("tt-4p-2500-100000-v1510_14TEV_%s_%s_%s" , phase , config , PU )
-  // };
+//   char* names[n] = {Form("tt-4p-0-600-v1510_14TEV_%s_%s_%s"       , phase , config , PU ) ,
+//   		    Form("tt-4p-600-1100-v1510_14TEV_%s_%s_%s"    , phase , config , PU ) ,
+//   		    Form("tt-4p-1100-1700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+//   		    Form("tt-4p-1700-2500-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+//   		    Form("tt-4p-2500-100000-v1510_14TEV_%s_%s_%s" , phase , config , PU )
+//   };
 
-  // char* labels[n] = {"S*_{T} < 0.6 TeV",
-  // 		     "S*_{T} 0.6-1.1 TeV",
-  // 		     "S*_{T} 1.1-1.7 TeV",
-  // 		     "S*_{T} 1.7-2.5 TeV",
-  // 		     "S*_{T} > 2.5 TeV"
-  // };
+//   char* labels[n] = {"S*_{T} < 0.6 TeV",
+//   		     "S*_{T} 0.6-1.1 TeV",
+//   		     "S*_{T} 1.1-1.7 TeV",
+//   		     "S*_{T} 1.7-2.5 TeV",
+//   		     "S*_{T} > 2.5 TeV"
+//   };
 
-  // char* filename = "plots/tt-ST.pdf";
+//   char* filename = "plots/tt-ST.pdf";
 
 
   // //-------------------------------
@@ -167,8 +169,8 @@ void sanityChecker(){
 
   int   colors[6] = { 2 , 3 , 4 , 5 , 6 , 7 };
 
-  TH1F* hst[n];
-  TH1F* hstlo[n];
+  TH1* hst[n];
+  TH1* hstlo[n];
 
   THStack* htstack = new THStack();
 
@@ -185,8 +187,8 @@ void sanityChecker(){
   for( int i = 0 ; i < n ; i++ ){
 
     files[i] = TFile::Open(Form("output/%s/%s.root",version,names[i]));
-    hst[i] = (TH1F*) files[i]->Get("st");
-    hstlo[i] = (TH1F*) files[i]->Get("stlo");
+    hst[i] = (TH1*) files[i]->Get("st");
+    hstlo[i] = (TH1*) files[i]->Get("stlo");
     hst[i]->SetFillColor(colors[i]);
 
     hst[i]->Rebin(rebin);
