@@ -11,6 +11,6 @@ echo "config" ${config}
 echo "PU" ${PU}
 echo "sample" ${sample}
 
-eoscms ls /eos/cms/store/group/phys_higgs/upgrade/${phase}/${config}/SUSY_SIGNAL/${PU}/${sample}/ | grep root > fileLists/${sample}_${phase}_${config}_${PU}.txt
+eoscms ls /eos/cms/store/group/phys_higgs/upgrade/${phase}/${config}/SUSY_SIGNAL/${PU}/${sample}_Jul31/ | grep root > fileLists/${sample}_${phase}__${PU}.txt
 # prepend the specific path to the file name
-sed -i -e "s/^/${phase}\/${config}\/SUSY_SIGNAL\/${PU}\/${sample}\//" fileLists/${sample}_${phase}_${config}_${PU}.txt
+sed -i -e "s/^/phys_higgs\/upgrade\/${phase}\/${config}\/SUSY_SIGNAL\/${PU}\/${sample}_Jul31\//" fileLists/${sample}_${phase}__${PU}.txt

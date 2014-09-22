@@ -30,7 +30,7 @@ using namespace std;
 void sanityChecker_babies(){
 
   int rebin = 1 ;
-  char* version = (char*) "V00-00-05";
+  char* version = (char*) "V00-00-11";
 
   //-------------------------------
   // choose config/PU scenario
@@ -40,11 +40,13 @@ void sanityChecker_babies(){
   char* phase = (char*) "PhaseII";
 
   //  char* config = (char*) "Configuration0";
-  char* config = (char*) "Configuration4v2";
+  //  char* config = (char*) "Conf4";
+  char* config = (char*) "";
 
   //  char* PU = (char*) "NoPileUp";
   //char* PU = (char*) "40PileUp";
-  char* PU = (char*) "140PileUp";
+  //  char* PU = (char*) "140PileUp";
+  char* PU = (char*) "140PU";
 
   // //-------------------------------
   // // diboson filenames and labels
@@ -94,27 +96,27 @@ void sanityChecker_babies(){
   char* filename = "plots/Bj-ST.pdf";
 
 
-//   //-------------------------------
-//   // ttbar filenames and labels
-//   //-------------------------------
+  // //-------------------------------
+  // // ttbar filenames and labels
+  // //-------------------------------
 
-//   const unsigned int n = 5;
+  // const unsigned int n = 5;
 
-//   char* names[n] = {Form("tt-4p-0-600-v1510_14TEV_%s_%s_%s"       , phase , config , PU ) ,
-//   		    Form("tt-4p-600-1100-v1510_14TEV_%s_%s_%s"    , phase , config , PU ) ,
-//   		    Form("tt-4p-1100-1700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-//   		    Form("tt-4p-1700-2500-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-//   		    Form("tt-4p-2500-100000-v1510_14TEV_%s_%s_%s" , phase , config , PU )
-//   };
+  // char* names[n] = {Form("tt-4p-0-600-v1510_14TEV_%s_%s_%s"       , phase , config , PU ) ,
+  // 		    Form("tt-4p-600-1100-v1510_14TEV_%s_%s_%s"    , phase , config , PU ) ,
+  // 		    Form("tt-4p-1100-1700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+  // 		    Form("tt-4p-1700-2500-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+  // 		    Form("tt-4p-2500-100000-v1510_14TEV_%s_%s_%s" , phase , config , PU )
+  // };
 
-//   char* labels[n] = {"S*_{T} < 0.6 TeV",
-//   		     "S*_{T} 0.6-1.1 TeV",
-//   		     "S*_{T} 1.1-1.7 TeV",
-//   		     "S*_{T} 1.7-2.5 TeV",
-//   		     "S*_{T} > 2.5 TeV"
-//   };
+  // char* labels[n] = {"S*_{T} < 0.6 TeV",
+  // 		     "S*_{T} 0.6-1.1 TeV",
+  // 		     "S*_{T} 1.1-1.7 TeV",
+  // 		     "S*_{T} 1.7-2.5 TeV",
+  // 		     "S*_{T} > 2.5 TeV"
+  // };
 
-//   char* filename = "plots/tt-ST.pdf";
+  // char* filename = "plots/tt-ST.pdf";
 
 
   // //-------------------------------
@@ -192,7 +194,7 @@ void sanityChecker_babies(){
     hst[i]   = new TH1D("hst"  ,"weighted S_{T} [GeV]",100,0,10000);
     hstlo[i] = new TH1D("hstlo","unweighted S_{T} [GeV]",100,0,10000);
 
-    chains[i]->Draw("st>>hst"  ,"weight*stweight");
+    chains[i]->Draw("st>>hst"  ,"weight*genweight");
     chains[i]->Draw("st>>hstlo","weight");
 
     hst[i]->SetFillColor(colors[i]);

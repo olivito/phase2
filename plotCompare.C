@@ -27,7 +27,7 @@ void makePlot( vector<TChain*> samples , vector<string> names , char* var , char
   
   const unsigned int n = samples.size();
 
-  TH1F* h[n];
+  TH1D* h[n];
 
   TCanvas* can = new TCanvas(Form("%s_can",var),Form("%s_can",var),800,600);
   can->cd();
@@ -46,7 +46,7 @@ void makePlot( vector<TChain*> samples , vector<string> names , char* var , char
   char* legentry = "";
 
   for( unsigned int i = 0 ; i < n ; i++ ){
-    h[i] = new TH1F(Form("hist_%s_%s",names.at(i).c_str(),var),"",nbin,xmin,xmax);
+    h[i] = new TH1D(Form("hist_%s_%s",names.at(i).c_str(),var),"",nbin,xmin,xmax);
     samples.at(i)->Draw(Form("min(%s,%f)>>hist_%s_%s",var,xmax-0.0001,names.at(i).c_str(),var),(sel)*weight);
     h[i]->SetLineColor(linecolors[i]);
     h[i]->SetLineWidth(2);

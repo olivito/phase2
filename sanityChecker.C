@@ -29,7 +29,7 @@ using namespace std;
 void sanityChecker(){
 
   int rebin = 10;
-  char* version = "V00-00-05";
+  char* version = "V00-00-08";
   //char* version = "temp";
 
   //-------------------------------
@@ -40,7 +40,8 @@ void sanityChecker(){
   char* phase = (char*) "PhaseII";
 
   //char* config = (char*) "Configuration0";
-  char* config = (char*) "Configuration4v2";
+  //  char* config = (char*) "Configuration4v2";
+  char* config = (char*) "Conf4";
 
   //char* PU = (char*) "NoPileUp";
   //char* PU = (char*) "40PileUp";
@@ -68,53 +69,53 @@ void sanityChecker(){
   // char* filename = "plots/BB-ST.pdf";
 
 
-  //-------------------------------
-  // boson+jets filenames and labels
-  //-------------------------------
+  // //-------------------------------
+  // // boson+jets filenames and labels
+  // //-------------------------------
 
-  const unsigned int n = 7;
+  // const unsigned int n = 7;
 
-  char* names[n] = {Form("Bj-4p-0-300-v1510_14TEV_%s_%s_%s"       , phase , config , PU ) ,
-  		    Form("Bj-4p-300-600-v1510_14TEV_%s_%s_%s"     , phase , config , PU ) ,
-  		    Form("Bj-4p-600-1100-v1510_14TEV_%s_%s_%s"    , phase , config , PU ) ,
-  		    Form("Bj-4p-1100-1800-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-  		    Form("Bj-4p-1800-2700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-  		    Form("Bj-4p-2700-3700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-  		    Form("Bj-4p-3700-100000-v1510_14TEV_%s_%s_%s" , phase , config , PU ) 
-  };
+  // char* names[n] = {Form("Bj-4p-0-300-v1510_14TEV_%s_%s_%s"       , phase , config , PU ) ,
+  // 		    Form("Bj-4p-300-600-v1510_14TEV_%s_%s_%s"     , phase , config , PU ) ,
+  // 		    Form("Bj-4p-600-1100-v1510_14TEV_%s_%s_%s"    , phase , config , PU ) ,
+  // 		    Form("Bj-4p-1100-1800-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+  // 		    Form("Bj-4p-1800-2700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+  // 		    Form("Bj-4p-2700-3700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+  // 		    Form("Bj-4p-3700-100000-v1510_14TEV_%s_%s_%s" , phase , config , PU ) 
+  // };
  
-  char* labels[n] = {"S*_{T} < 0.3 TeV",
-  		     "S*_{T} 0.3-0.6 TeV",
+  // char* labels[n] = {"S*_{T} < 0.3 TeV",
+  // 		     "S*_{T} 0.3-0.6 TeV",
+  // 		     "S*_{T} 0.6-1.1 TeV",
+  // 		     "S*_{T} 1.1-1.8 TeV",
+  // 		     "S*_{T} 1.8-2.7 TeV",
+  // 		     "S*_{T} 2.7-3.7 TeV",
+  // 		     "S*_{T} > 3.7 TeV"};
+
+  // char* filename = "plots/Bj-ST.pdf";
+
+
+  //-------------------------------
+  // ttbar filenames and labels
+  //-------------------------------
+
+  const unsigned int n = 5;
+
+  char* names[n] = {Form("tt-4p-0-600-v1510_14TEV_%s_%s_%s"       , phase , config , PU ) ,
+  		    Form("tt-4p-600-1100-v1510_14TEV_%s_%s_%s"    , phase , config , PU ) ,
+  		    Form("tt-4p-1100-1700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+  		    Form("tt-4p-1700-2500-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
+  		    Form("tt-4p-2500-100000-v1510_14TEV_%s_%s_%s" , phase , config , PU )
+  };
+
+  char* labels[n] = {"S*_{T} < 0.6 TeV",
   		     "S*_{T} 0.6-1.1 TeV",
-  		     "S*_{T} 1.1-1.8 TeV",
-  		     "S*_{T} 1.8-2.7 TeV",
-  		     "S*_{T} 2.7-3.7 TeV",
-  		     "S*_{T} > 3.7 TeV"};
+  		     "S*_{T} 1.1-1.7 TeV",
+  		     "S*_{T} 1.7-2.5 TeV",
+  		     "S*_{T} > 2.5 TeV"
+  };
 
-  char* filename = "plots/Bj-ST.pdf";
-
-
-//   //-------------------------------
-//   // ttbar filenames and labels
-//   //-------------------------------
-
-//   const unsigned int n = 5;
-
-//   char* names[n] = {Form("tt-4p-0-600-v1510_14TEV_%s_%s_%s"       , phase , config , PU ) ,
-//   		    Form("tt-4p-600-1100-v1510_14TEV_%s_%s_%s"    , phase , config , PU ) ,
-//   		    Form("tt-4p-1100-1700-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-//   		    Form("tt-4p-1700-2500-v1510_14TEV_%s_%s_%s"   , phase , config , PU ) ,
-//   		    Form("tt-4p-2500-100000-v1510_14TEV_%s_%s_%s" , phase , config , PU )
-//   };
-
-//   char* labels[n] = {"S*_{T} < 0.6 TeV",
-//   		     "S*_{T} 0.6-1.1 TeV",
-//   		     "S*_{T} 1.1-1.7 TeV",
-//   		     "S*_{T} 1.7-2.5 TeV",
-//   		     "S*_{T} > 2.5 TeV"
-//   };
-
-//   char* filename = "plots/tt-ST.pdf";
+  char* filename = "plots/tt-ST.pdf";
 
 
   // //-------------------------------
