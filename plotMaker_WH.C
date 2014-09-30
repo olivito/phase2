@@ -190,7 +190,7 @@ void makePlot( vector<TChain*> samples , vector<string> names , const char* var 
   leg->Draw();
   hdummy->Draw("axissame");
 
-  CMS_lumi( can, iPeriod, iPos );
+  CMS_lumi_v2( can, iPeriod, iPos );
 
   can->Update();
 
@@ -294,7 +294,7 @@ void print_table( vector<TChain*> samples , vector<string> names , std::vector<s
 
 void plotMaker_WH(){
 
-  gROOT->LoadMacro("CMS_lumi.C");
+  gROOT->LoadMacro("CMS_lumi_v2.C");
 
   // cmsText     = "CMS Phase I Simulation";
   // lumi_14TeV = "300 fb^{-1}, PU = 50"; // default is "3000 fb^{-1}"
