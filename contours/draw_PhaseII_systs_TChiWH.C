@@ -18,7 +18,7 @@ const int iPos = 33;
 
 void draw_PhaseII_systs_TChiWH(TString infile = "contours_TChiWH.root") {
 
-  gROOT->LoadMacro("CMS_lumi.C");
+  gROOT->LoadMacro("CMS_lumi_v2.C");
 
   cmsText     = "CMS Phase II Simulation";
   writeExtraText = false;       // if extra text
@@ -80,7 +80,7 @@ void draw_PhaseII_systs_TChiWH(TString infile = "contours_TChiWH.root") {
 
   leg->Draw("same");
 
-  CMS_lumi( c1, iPeriod, iPos );
+  CMS_lumi_v2( c1, iPeriod, iPos );
 
   TLatex latex;
   latex.SetNDC();

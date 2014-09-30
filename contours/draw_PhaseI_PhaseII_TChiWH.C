@@ -18,11 +18,11 @@ const int iPos = 33;
 
 void draw_PhaseI_PhaseII_TChiWH(TString infile = "contours_TChiWH.root") {
 
-  gROOT->LoadMacro("CMS_lumi.C");
+  gROOT->LoadMacro("CMS_lumi_v2.C");
 
   cmsText     = "CMS Phase I/II Simulation";
   writeExtraText = false;       // if extra text
-  lumi_14TeV = "300-3000 fb^{-1}, PU = 50-140"; // default is "3000 fb^{-1}"
+  lumi_14TeV = "300/3000 fb^{-1}, PU = 50/140"; // default is "3000 fb^{-1}"
 
   TCanvas* c1 = new TCanvas("c1","c1",800,600);
   c1->cd();
@@ -80,7 +80,7 @@ void draw_PhaseI_PhaseII_TChiWH(TString infile = "contours_TChiWH.root") {
 
   leg->Draw("same");
 
-  CMS_lumi( c1, iPeriod, iPos );
+  CMS_lumi_v2( c1, iPeriod, iPos );
 
   TLatex latex;
   latex.SetNDC();
