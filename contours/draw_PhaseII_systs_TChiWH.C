@@ -20,7 +20,7 @@ void draw_PhaseII_systs_TChiWH(TString infile = "contours_TChiWH.root") {
 
   gROOT->LoadMacro("CMS_lumi_v2.C");
 
-  cmsText     = "CMS Phase II Simulation";
+  cmsText     = "CMS Phase II Delphes Simulation";
   writeExtraText = false;       // if extra text
   lumi_14TeV = "3000 fb^{-1}, PU = 140"; // default is "3000 fb^{-1}"
 
@@ -37,20 +37,22 @@ void draw_PhaseII_systs_TChiWH(TString infile = "contours_TChiWH.root") {
   h_base->Draw();
 
   g_signif_PhaseII_3000fb->SetLineWidth(3);
-  g_signif_PhaseII_3000fb->SetLineStyle(3);
+  g_signif_PhaseII_3000fb->SetLineStyle(1);
   g_signif_PhaseII_3000fb->SetLineColor(kBlue);
   g_signif_PhaseII_3000fb->Draw("l same");
 
   g_signif_PhaseII_syst25_3000fb->SetLineWidth(3);
-  g_signif_PhaseII_syst25_3000fb->SetLineColor(kBlue);
+  g_signif_PhaseII_syst25_3000fb->SetLineStyle(1);
+  g_signif_PhaseII_syst25_3000fb->SetLineColor(kRed);
   g_signif_PhaseII_syst25_3000fb->Draw("l same");
 
   g_rinv_PhaseII_3000fb->SetLineWidth(3);
   g_rinv_PhaseII_3000fb->SetLineStyle(3);
-  g_rinv_PhaseII_3000fb->SetLineColor(kRed);
+  g_rinv_PhaseII_3000fb->SetLineColor(kBlue);
   g_rinv_PhaseII_3000fb->Draw("l same");
 
   g_rinv_PhaseII_syst25_3000fb->SetLineWidth(3);
+  g_rinv_PhaseII_syst25_3000fb->SetLineStyle(3);
   g_rinv_PhaseII_syst25_3000fb->SetLineColor(kRed);
   g_rinv_PhaseII_syst25_3000fb->Draw("l same");
 
@@ -61,6 +63,7 @@ void draw_PhaseII_systs_TChiWH(TString infile = "contours_TChiWH.root") {
 
   TFile* fold = new TFile("limits_wh.root");
   observed->SetLineWidth(3);
+  observed->SetLineStyle(3);
   observed->SetLineColor(kGreen+2);
   observed->Draw("same");
 
@@ -73,10 +76,10 @@ void draw_PhaseII_systs_TChiWH(TString infile = "contours_TChiWH.root") {
   leg->SetTextSize(0.035);
   leg->AddEntry(observed,"2012 Observed 95% CL Exclusion ","l");
 
-  leg->AddEntry(g_rinv_PhaseII_3000fb,"3000fb^{-1} 95% CL Exclusion, 12.5% syst","l");
-  leg->AddEntry(g_rinv_PhaseII_syst25_3000fb,"3000fb^{-1} 95% CL Exclusion, 25% syst","l");
-  leg->AddEntry(g_signif_PhaseII_3000fb,"3000fb^{-1} 5#sigma Discovery, 12.5% syst","l");
-  leg->AddEntry(g_signif_PhaseII_syst25_3000fb,"3000fb^{-1} 5#sigma Discovery, 25% syst","l");
+  leg->AddEntry(g_rinv_PhaseII_3000fb,"3000 fb^{-1} 95% CL Exclusion, 12.5% syst","l");
+  leg->AddEntry(g_rinv_PhaseII_syst25_3000fb,"3000 fb^{-1} 95% CL Exclusion, 25% syst","l");
+  leg->AddEntry(g_signif_PhaseII_3000fb,"3000 fb^{-1} 5#sigma Discovery, 12.5% syst","l");
+  leg->AddEntry(g_signif_PhaseII_syst25_3000fb,"3000 fb^{-1} 5#sigma Discovery, 25% syst","l");
 
   leg->Draw("same");
 

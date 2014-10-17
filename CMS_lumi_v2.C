@@ -70,11 +70,14 @@ CMS_lumi_v2( TPad* pad, int iPeriod, int iPosX )
     }
   else if ( iPeriod==14 )
     {
-      lumiText += "14 TeV, ";
+      lumiText += "14 TeV, ";  
       lumiText += lumi_14TeV;
     }
  
   cout << lumiText << endl;
+
+  //KH-mod
+  writeExtraText = true; // KH doesn't know why we have to re-set this boolean
 
   TLatex latex;
   latex.SetNDC();

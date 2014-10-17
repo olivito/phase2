@@ -20,7 +20,7 @@ void draw_PhaseII_br_TChiWH(TString infile = "contours_TChiWH.root") {
 
   gROOT->LoadMacro("CMS_lumi_v2.C");
 
-  cmsText     = "CMS Phase II Simulation";
+  cmsText     = "CMS Phase II Delphes Simulation";
   writeExtraText = false;       // if extra text
   lumi_14TeV = "3000 fb^{-1}, PU = 140"; // default is "3000 fb^{-1}"
 
@@ -37,20 +37,22 @@ void draw_PhaseII_br_TChiWH(TString infile = "contours_TChiWH.root") {
   h_base->Draw();
 
   g_signif_PhaseII_3000fb->SetLineWidth(3);
-  g_signif_PhaseII_3000fb->SetLineStyle(3);
+  g_signif_PhaseII_3000fb->SetLineStyle(1);
   g_signif_PhaseII_3000fb->SetLineColor(kBlue);
   g_signif_PhaseII_3000fb->Draw("l same");
 
   g_rinv_PhaseII_3000fb->SetLineWidth(3);
+  g_rinv_PhaseII_3000fb->SetLineStyle(3);
   g_rinv_PhaseII_3000fb->SetLineColor(kBlue);
   g_rinv_PhaseII_3000fb->Draw("l same");
 
   g_signif_PhaseII_br50_3000fb->SetLineWidth(3);
-  g_signif_PhaseII_br50_3000fb->SetLineStyle(3);
+  g_signif_PhaseII_br50_3000fb->SetLineStyle(1);
   g_signif_PhaseII_br50_3000fb->SetLineColor(kMagenta);
   g_signif_PhaseII_br50_3000fb->Draw("l same");
 
   g_rinv_PhaseII_br50_3000fb->SetLineWidth(3);
+  g_rinv_PhaseII_br50_3000fb->SetLineStyle(3);
   g_rinv_PhaseII_br50_3000fb->SetLineColor(kMagenta);
   g_rinv_PhaseII_br50_3000fb->Draw("l same");
 
@@ -66,10 +68,10 @@ void draw_PhaseII_br_TChiWH(TString infile = "contours_TChiWH.root") {
   TLegend* leg = new TLegend(0.19,0.60,0.54,0.84);
   leg->SetFillColor(0);
   leg->SetTextSize(0.035);
-  leg->AddEntry(g_rinv_PhaseII_3000fb,"3000fb^{-1} 95% CL Exclusion, BR = 1.0","l");
-  leg->AddEntry(g_signif_PhaseII_3000fb,"3000fb^{-1} 5#sigma Discovery, BR = 1.0","l");
-  leg->AddEntry(g_rinv_PhaseII_br50_3000fb,"3000fb^{-1} 95% CL Exclusion, BR = 0.5","l");
-  leg->AddEntry(g_signif_PhaseII_br50_3000fb,"3000fb^{-1} 5#sigma Discovery, BR = 0.5","l");
+  leg->AddEntry(g_rinv_PhaseII_3000fb,"3000 fb^{-1} 95% CL Exclusion, BR = 1.0","l");
+  leg->AddEntry(g_signif_PhaseII_3000fb,"3000 fb^{-1} 5#sigma Discovery, BR = 1.0","l");
+  leg->AddEntry(g_rinv_PhaseII_br50_3000fb,"3000 fb^{-1} 95% CL Exclusion, BR = 0.5","l");
+  leg->AddEntry(g_signif_PhaseII_br50_3000fb,"3000 fb^{-1} 5#sigma Discovery, BR = 0.5","l");
 
   leg->Draw("same");
 
