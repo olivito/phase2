@@ -16,13 +16,14 @@ const int iPeriod = 14;    // 1=7TeV, 2=8TeV, 3=7+8TeV, 7=7+8+13TeV, 14= PU=140,
 
 const int iPos = 33;
 
-void draw_aged_TChiWH(TString infile = "contours_TChiWH.root") {
+void draw_putrkextcomp_TChiWH(TString infile = "contours_TChiWH.root") {
 
   gROOT->LoadMacro("CMS_lumi_v2.C");
 
-  cmsText     = "CMS Phase I/II Delphes Simulation";
+  cmsText     = "CMS Phase II Delphes Simulation";
+  extraText = ""; // remove Preliminary
   writeExtraText = false;       // if extra text
-  lumi_14TeV = "300/3000 fb^{-1}, PU = 50/140"; // default is "3000 fb^{-1}"
+  lumi_14TeV = "PU = 140/200"; // default is "3000 fb^{-1}"
 
   TCanvas* c1 = new TCanvas("c1","c1",800,600);
   c1->cd();
@@ -39,23 +40,23 @@ void draw_aged_TChiWH(TString infile = "contours_TChiWH.root") {
 
   g_signif_PhaseII_3000fb->SetLineWidth(3);
   g_signif_PhaseII_3000fb->SetLineStyle(1);
-  g_signif_PhaseII_3000fb->SetLineColor(8); // some shade of green
+  g_signif_PhaseII_3000fb->SetLineColor(kRed);
   g_signif_PhaseII_3000fb->Draw("l same");
 
-  g_signif_PhaseII_1000fb->SetLineWidth(3);
-  g_signif_PhaseII_1000fb->SetLineStyle(1);
-  g_signif_PhaseII_1000fb->SetLineColor(kGreen+3);
-  g_signif_PhaseII_1000fb->Draw("l same");
+  // g_signif_PhaseII_PU200_3000fb->SetLineWidth(3);
+  // g_signif_PhaseII_PU200_3000fb->SetLineStyle(1);
+  // g_signif_PhaseII_PU200_3000fb->SetLineColor(kGreen-2);
+  // g_signif_PhaseII_PU200_3000fb->Draw("l same");
 
-  g_signif_PhaseI_300fb->SetLineWidth(3);
-  g_signif_PhaseI_300fb->SetLineStyle(1);
-  g_signif_PhaseI_300fb->SetLineColor(kBlue);
-  g_signif_PhaseI_300fb->Draw("l same");
+  g_signif_PhaseII_PU200_4000fb->SetLineWidth(3);
+  g_signif_PhaseII_PU200_4000fb->SetLineStyle(1);
+  g_signif_PhaseII_PU200_4000fb->SetLineColor(kMagenta);
+  g_signif_PhaseII_PU200_4000fb->Draw("l same");
 
-  g_signif_aged_TPfinal_combined_1000fb->SetLineWidth(3);
-  g_signif_aged_TPfinal_combined_1000fb->SetLineStyle(1);
-  g_signif_aged_TPfinal_combined_1000fb->SetLineColor(kRed);
-  g_signif_aged_TPfinal_combined_1000fb->Draw("l same");
+  g_signif_PhaseII_NoTrkExt_3000fb->SetLineWidth(3);
+  g_signif_PhaseII_NoTrkExt_3000fb->SetLineStyle(1);
+  g_signif_PhaseII_NoTrkExt_3000fb->SetLineColor(kBlue);
+  g_signif_PhaseII_NoTrkExt_3000fb->Draw("l same");
 
   TLine* diag = new TLine(125.,0.,675.,550.);
   diag->SetLineWidth(3);
@@ -69,10 +70,10 @@ void draw_aged_TChiWH(TString infile = "contours_TChiWH.root") {
   TLegend* leg = new TLegend(0.19,0.56,0.54,0.84,"5#sigma Discovery Reach");
   leg->SetFillColor(0);
   leg->SetTextSize(0.04);
-  leg->AddEntry(g_signif_PhaseI_300fb,"300 fb^{-1} Phase I","l");
-  leg->AddEntry(g_signif_aged_TPfinal_combined_1000fb,"1000 fb^{-1} Aged","l");
-  leg->AddEntry(g_signif_PhaseII_1000fb,"1000 fb^{-1} Phase II","l");
-  leg->AddEntry(g_signif_PhaseII_3000fb,"3000 fb^{-1} Phase II","l");
+  leg->AddEntry(g_signif_PhaseII_3000fb,"3000 fb^{-1} Phase II, 140PU","l");
+  //  leg->AddEntry(g_signif_PhaseII_PU200_3000fb,"3000 fb^{-1} Phase II, 200PU","l");
+  leg->AddEntry(g_signif_PhaseII_PU200_4000fb,"4000 fb^{-1} Phase II, 200PU","l");
+  leg->AddEntry(g_signif_PhaseII_NoTrkExt_3000fb,"3000 fb^{-1} Phase II, 140PU, No Tracker Extension","l");
 
   leg->Draw("same");
 
@@ -89,7 +90,7 @@ void draw_aged_TChiWH(TString infile = "contours_TChiWH.root") {
 
   gPad->Modified();
 
-  c1->SaveAs("contours_agedcomp.eps");
-  c1->SaveAs("contours_agedcomp.pdf");
+  c1->SaveAs("contours_putrkextcomp_4000fb.eps");
+  c1->SaveAs("contours_putrkextcomp_4000fb.pdf");
 }
 
