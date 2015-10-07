@@ -152,7 +152,7 @@ for val in better_sorted:
 f_points.close()
 
 if options.graph:
-    g_cmd = 'root -b -q points_to_graph.C\(\\"'+f_points_name+'\\"\)'
+    g_cmd = 'root -b -q points_to_graph.C+\(\\"'+f_points_name+'\\"\)'
     print g_cmd
     run_bash(g_cmd)
 
