@@ -2,6 +2,7 @@
 #include <utility>
 #include <vector>
 #include <fstream>
+#include <string>
 
 #include "TROOT.h"
 #include "TCut.h"
@@ -23,15 +24,35 @@
 
 using namespace std;
 
-// #include "TFile.h"
-// #include "TCut.h"
-// #include "TString.h"
-// #include "TH1.h"
-// #include "TH2.h"
-
 // bool write_yields = true;
 // bool write_signif = true;
 // bool write_rinv = true;
+
+void writeCard(const TString& cardname, float nsig, float nbkg, float sbkg, float seff = 1.00){
+
+  ofstream* ofile = new ofstream();
+
+  ofile->open(Form("%s.txt",cardname.Data()));
+
+  *ofile <<  "imax 1  number of channels"                                                    << endl;
+  *ofile <<  "jmax 1  number of backgrounds"                                                 << endl;
+  *ofile <<  "kmax 2  number of nuisance parameters (sources of systematical uncertainties)" << endl;
+  *ofile <<  "------------"                                                                  << endl;
+  *ofile <<  "bin         1"                                                                 << endl;
+  *ofile <<  Form("observation %.0f",nsig+nbkg)                                              << endl;
+  *ofile <<  "------------"                                                                  << endl;
+  *ofile <<  "bin             1      1"                                                      << endl;
+  *ofile <<  "process       signal  background"                                              << endl; 
+  *ofile <<  "process         0      1"                                                      << endl;
+  *ofile <<  Form("rate            %.1f    %.1f",nsig,nbkg)                                  << endl;
+  *ofile <<  "------------"                                                                  << endl;
+  *ofile <<  Form("deltaS  lnN   %.2f    -     uncertainty on signal",seff)                  << endl;
+  *ofile <<  Form("deltaB  lnN     -   %.3f    uncertainty on background",sbkg)              << endl; 
+
+  ofile->close();
+
+  return;
+}
 
 void scan_results(TString infile = "output/V00-00-12/skim_1lpt30_2b_aged/TChiWH14Pythia_PhaseII__140PU_baby.root", TString output = "test.root", float br = 1.0) {
 
@@ -67,6 +88,8 @@ void scan_results(TString infile = "output/V00-00-12/skim_1lpt30_2b_aged/TChiWH1
   TCut mt100("mt > 100.0");
   TCut pujetmt100("pujetmt > 100.0");
   TCut smearmt100("smearmt > 100.0");
+  TCut smearmt150("smearmt > 150.0");
+  TCut smearmt200("smearmt > 200.0");
   TCut met200("met > 200.0");
   TCut met300("met > 300.0");
   TCut met400("met > 400.0");
@@ -79,13 +102,17 @@ void scan_results(TString infile = "output/V00-00-12/skim_1lpt30_2b_aged/TChiWH1
   TCut smearmet300("smearmet > 300.0");
   TCut smearmet400("smearmet > 400.0");
   TCut smearmet500("smearmet > 500.0");
+  TCut smearmet600("smearmet > 600.0");
   TCut mct160("mct > 160.0");
   TCut mbb90("mbb > 90.0 && mbb < 150.0");
   TCut photveto100("phot1pt < 100.");
   TCut dmet200("abs(met - pujetmet)< 200.0");
 
+  // // TString scenario = "PhaseII_700fb";
+  // TString scenario = "PhaseII_3000fb";
   // TCut weight("3000. * weight * genweight * bgweight");
   // //  TCut weight("1000. * weight * genweight * bgweight");
+  // //  TCut weight("700. * weight * genweight * bgweight");
   // //TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90;
   // TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200;
   // TCut sigsel = presel + nj2 + pujetmt100 + mct160;
@@ -94,18 +121,78 @@ void scan_results(TString infile = "output/V00-00-12/skim_1lpt30_2b_aged/TChiWH1
   // TCut sig400 = sigsel + pujetmet400;
   // TCut sig500 = sigsel + pujetmet500;
 
-  // --- aged detector
-  TCut weight("1000. * weight * genweight * bgweight * agedweight");
-  TCut presel = agednlep1 + agedlep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200;
-  TCut sigsel = presel + nj2 + smearmt100 + mct160;
+  // // --- aged detector
+  // TString scenario = "aged_700fb";
+  // TCut weight("700. * weight * genweight * bgweight * agedweight");
+  // TCut presel = agednlep1 + agedlep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200;
+  // TCut sigsel = presel + nj2 + smearmt100 + mct160;
+  // TCut sig200 = sigsel + smearmet200;
+  // TCut sig300 = sigsel + smearmet300;
+  // TCut sig400 = sigsel + smearmet400;
+  // TCut sig500 = sigsel + smearmet500;
+
+  // TString scenario = "aged_nosmear_700fb";
+  // TCut weight("700. * weight * genweight * bgweight * agedweight");
+  // TCut presel = agednlep1 + agedlep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200;
+  // TCut sigsel = presel + nj2 + pujetmt100 + mct160;
+  // TCut sig200 = sigsel + pujetmet200;
+  // TCut sig300 = sigsel + pujetmet300;
+  // TCut sig400 = sigsel + pujetmet400;
+  // TCut sig500 = sigsel + pujetmet500;
+
+  // TString scenario = "aged_TPfinal_700fb";
+  // TCut weight("700. * weight * genweight * bgweight * agedweight");
+  // TCut presel = agednlep1 + agedlep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200;
+  // TCut sigsel = presel + nj2 + smearmt100 + mct160;
+  // TCut sig200 = sigsel + smearmet200;
+  // TCut sig300 = sigsel + smearmet300;
+  // TCut sig400 = sigsel + smearmet400;
+  // TCut sig500 = sigsel + smearmet500;
+
+  // TString scenario = "PhaseII_PU200_3000fb";
+  // TCut weight("3000. * weight * genweight * bgweight");
+  // TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200;
+  // TCut sigsel = presel + nj2 + smearmt150 + mct160;
+  // TCut sig200 = sigsel + smearmet200;
+  // TCut sig300 = sigsel + smearmet300;
+  // TCut sig400 = sigsel + smearmet400;
+  // TCut sig500 = sigsel + smearmet500;
+
+  // TString scenario = "PhaseII_PU200_4000fb";
+  // TCut weight("4000. * weight * genweight * bgweight");
+  // TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200;
+  // TCut sigsel = presel + nj2 + smearmt150 + mct160;
+  // TCut sig200 = sigsel + smearmet200;
+  // TCut sig300 = sigsel + smearmet300;
+  // TCut sig400 = sigsel + smearmet400;
+  // TCut sig500 = sigsel + smearmet500;
+
+  TString scenario = "PhaseII_NoTrkExt_3000fb";
+  TCut weight("3000. * weight * genweight * bgweight");
+  TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200;
+  TCut sigsel = presel + nj2 + smearmt200 + mct160;
   TCut sig200 = sigsel + smearmet200;
   TCut sig300 = sigsel + smearmet300;
   TCut sig400 = sigsel + smearmet400;
   TCut sig500 = sigsel + smearmet500;
+  TCut sig600 = sigsel + smearmet600;
 
-  const unsigned int nregs = 4;
-  TCut sigregs[nregs] = {sig200, sig300, sig400, sig500};
+  const unsigned int nregs = 5;
+  TCut sigregs[nregs] = {sig200, sig300, sig400, sig500, sig600};
 
+  // TString scenario = "PhaseI_3000fb";
+  // TCut weight("3000. * weight * genweight * bgweight");
+  // TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90;
+  // TCut sigsel = presel + nj2 + mt100 + mct160;
+  // TCut sig200 = sigsel + met200;
+  // TCut sig300 = sigsel + met300;
+  // TCut sig400 = sigsel + met400;
+  // TCut sig500 = sigsel + met500;
+
+  // const unsigned int nregs = 4;
+  // TCut sigregs[nregs] = {sig200, sig300, sig400, sig500};
+
+  // TString scenario = "PhaseI_300fb";
   // TCut weight("300. * weight * genweight * bgweight");
   // TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90;
   // TCut sigsel = presel + nj2 + mt100 + mct160;
@@ -134,17 +221,70 @@ void scan_results(TString infile = "output/V00-00-12/skim_1lpt30_2b_aged/TChiWH1
   // bg_yields.push_back(13.);
   // bg_yields.push_back(2.5);
 
-  // numbers with additional MET cleaning, PhaseII 140PU, AGED detector
-  // for 1000/fb
-  bg_yields.push_back(605.);
-  bg_yields.push_back(119.);
-  bg_yields.push_back(14.);
-  bg_yields.push_back(3.4);
+  //  // numbers with additional MET cleaning, PhaseII 140PU
+  // // for 700/fb
+  // bg_yields.push_back(329.);
+  // bg_yields.push_back(83.);
+  // bg_yields.push_back(9.1);
+  // bg_yields.push_back(1.7);
 
-  // // numbers from PhaseI 50PU
+  // // numbers with additional MET cleaning, PhaseII 140PU, AGED detector
+  // // for 1000/fb
+  // bg_yields.push_back(605.);
+  // bg_yields.push_back(119.);
+  // bg_yields.push_back(14.);
+  // bg_yields.push_back(3.4);
+
+  // // numbers with additional MET cleaning, PhaseII 140PU, AGED detector
+  // // for 700/fb
+  // bg_yields.push_back(410.);
+  // bg_yields.push_back(82.);
+  // bg_yields.push_back(10.);
+  // bg_yields.push_back(2.4);
+
+  // // numbers with additional MET cleaning, PhaseII 140PU, AGED detector, no MET smearing
+  // // for 700/fb
+  // bg_yields.push_back(125.);
+  // bg_yields.push_back(38.);
+  // bg_yields.push_back(4.4);
+  // bg_yields.push_back(0.5);
+
+  // // numbers with additional MET cleaning, PhaseII 140PU, AGED detector, TP final settings
+  // // for 700/fb
+  // bg_yields.push_back(233.);
+  // bg_yields.push_back(54.);
+  // bg_yields.push_back(5.3);
+  // bg_yields.push_back(0.9);
+
+  // // numbers for PhaseII smeared to PU200 3000/fb
+  // bg_yields.push_back(952.);
+  // bg_yields.push_back(193.);
+  // bg_yields.push_back(48.);
+  // bg_yields.push_back(16.);
+
+  // // numbers for PhaseII smeared to PU200 4000/fb
+  // bg_yields.push_back(1269.);
+  // bg_yields.push_back(257.);
+  // bg_yields.push_back(64.);
+  // bg_yields.push_back(21.);
+
+  // numbers for PhaseII smeared to NoTrkExt 3000/fb
+  bg_yields.push_back(704.);
+  bg_yields.push_back(160.);
+  bg_yields.push_back(57.);
+  bg_yields.push_back(20.);
+  bg_yields.push_back(13.);
+
+  // // numbers from PhaseI 50PU 3000/fb
+  // bg_yields.push_back(1289.);
+  // bg_yields.push_back(267.);
+  // bg_yields.push_back(37.);
+  // bg_yields.push_back(3.0);
+
+  // // numbers from PhaseI 50PU 300/fb
   // bg_yields.push_back(129.);
   // bg_yields.push_back(27.);
-  // bg_yields.push_back(3.7.);
+  // bg_yields.push_back(3.7);
 
   // // limits on nevents, from LandS with no signal systs, PhaseII 140PU
   // std::vector<float> limits_25;
@@ -196,12 +336,14 @@ void scan_results(TString infile = "output/V00-00-12/skim_1lpt30_2b_aged/TChiWH1
   limits_25.push_back(47.9);
   limits_25.push_back(10.2);
   limits_25.push_back(5.1);
+  limits_25.push_back(2); // dummy value
 
   std::vector<float> limits_12p5;
   limits_12p5.push_back(130.);
   limits_12p5.push_back(32.7);
   limits_12p5.push_back(9.1);
   limits_12p5.push_back(5.0);
+  limits_12p5.push_back(2); // dummy value
 
   // // limits on nevents, from LandS with no signal systs, PhaseI 50PU
   // std::vector<float> limits_25;
@@ -357,6 +499,7 @@ void scan_results(TString infile = "output/V00-00-12/skim_1lpt30_2b_aged/TChiWH1
 	float nbg = bg_yields.at(best_signif_12p5-1);
 	out_yields << Form("%d  %d    %.1f    %.1f",c1,n1,nbg,nsig) << endl;
 	out_signif << Form("%d  %d    %.3f",c1,n1,max_signif_12p5) << endl;
+        writeCard(Form("card_%s_%d_%d",scenario.Data(),c1,n1),nsig,nbg,1.125);
       }
 
       if (best_rinv_12p5 >= 1) {

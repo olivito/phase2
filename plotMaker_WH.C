@@ -75,7 +75,7 @@ void makePlot( vector<TChain*> samples , vector<string> names , const char* var 
   float ymax = 0;
   float ymin = 0.1;
 
-  TLegend* leg = new TLegend(0.62,0.48,0.92,0.83);
+  TLegend* leg = new TLegend(0.62,0.45,0.92,0.80);
   //  TLegend* leg = new TLegend(0.62,0.58,0.92,0.88);
   //  TLegend* leg = new TLegend(0.65,0.55,0.95,0.85);
   //  TLegend* leg = new TLegend(0.7,0.6,0.9,0.85);
@@ -296,16 +296,17 @@ void plotMaker_WH(){
 
   gROOT->LoadMacro("CMS_lumi_v2.C");
 
-  // cmsText     = "CMS Phase I Simulation";
-  // lumi_14TeV = "300 fb^{-1}, PU = 50"; // default is "3000 fb^{-1}"
-  cmsText     = "CMS Phase II Simulation";
+  //  cmsText     = "CMS Phase I Delphes Simulation";
+  //  lumi_14TeV = "300 fb^{-1}, PU = 50"; // default is "3000 fb^{-1}"
+  //  lumi_14TeV = "3000 fb^{-1}, PU = 50"; // default is "3000 fb^{-1}"
+  cmsText     = "CMS Phase II Delphes Simulation";
   lumi_14TeV = "3000 fb^{-1}, PU = 140"; // default is "3000 fb^{-1}"
   writeExtraText = false;       // if extra text
   //  extraText  = "Preliminary";  // default extra text is "Preliminary"
 
   //char* version = (char*) "V00-00-01";
-  char* version = (char*) "V00-00-12";
-  //char* version = (char*) "V00-00-12_nopujetid";
+  char* version = (char*) "V00-00-12"; // for phaseII
+  //char* version = (char*) "V00-00-12_nopujetid"; // for phaseI
   //  char* version = (char*) "merge";
 
   // char* phase = (char*) "PhaseI";
@@ -316,8 +317,11 @@ void plotMaker_WH(){
   char* config = (char*) "";
   char* PU = (char*) "140PU";
 
-  char* filter = "skim_1lpt30_2b";
-  //  char* filter = "skim_1lpt30_2b_aged";
+  //char* filter = "skim_1lpt30_2b";
+  //char* filter = "skim_1lpt30_2b_aged";
+  //char* filter = "skim_1lpt30_2b_agedTPfinal";
+  //char* filter = "skim_1lpt30_2b_agedPU200";
+  char* filter = "skim_1lpt30_2b_agedNoTrkExt";
   //char* filter = "";
 
   //---------------------------------
@@ -445,6 +449,9 @@ void plotMaker_WH(){
   sig_mchi.push_back(200); sig_mlsp.push_back(1);
   sig_mchi.push_back(500); sig_mlsp.push_back(1);
   sig_mchi.push_back(900); sig_mlsp.push_back(1);
+  // sig_mchi.push_back(1000); sig_mlsp.push_back(1);
+  // sig_mchi.push_back(1000); sig_mlsp.push_back(200);
+  // sig_mchi.push_back(1000); sig_mlsp.push_back(300);
   sig_mchi.push_back(0); sig_mlsp.push_back(0);
   
   //---------------------------------
@@ -461,7 +468,7 @@ void plotMaker_WH(){
   TCut agednlep1("agednleps==1");
   TCut agedptlep40("agedlep1pt>40");
   TCut agedetalep("abs(agedlep1eta) < 2.4");
-  TCut agedmu("agedlep1pt>35 && abs(agedlep1eta) < 1.1 && leptype == 1");
+  TCut agedmu("agedlep1pt>40 && abs(agedlep1eta) < 1.1 && leptype == 1");
   TCut agedel("agedlep1pt>50 && abs(agedlep1eta) < 2.4 && leptype == 0");
   TCut agedlep = agedmu || agedel;
 
@@ -484,6 +491,10 @@ void plotMaker_WH(){
   TCut mt600("mt > 600.0");
   TCut pujetmt100("pujetmt > 100.0");
   TCut smearmt100("smearmt > 100.0");
+  TCut smearmt120("smearmt > 120.0");
+  TCut smearmt130("smearmt > 130.0");
+  TCut smearmt150("smearmt > 150.0");
+  TCut smearmt200("smearmt > 200.0");
   TCut dmet200("abs(met - pujetmet)< 200.0");
   TCut met50("met > 50.0");
   TCut met100("met > 100.0");
@@ -506,6 +517,7 @@ void plotMaker_WH(){
   TCut smearmet300("smearmet > 300.0");
   TCut smearmet400("smearmet > 400.0");
   TCut smearmet500("smearmet > 500.0");
+  TCut smearmet600("smearmet > 600.0");
   TCut metlt200("met <= 200.0");
   TCut metlt300("met <= 300.0");
   TCut metlt400("met <= 400.0");
@@ -526,35 +538,36 @@ void plotMaker_WH(){
   TCut photveto100("phot1pt < 100.");
 
   TCut weight("3000. * weight * genweight * bgweight");
-  //  TCut weight("300. * weight * genweight * bgweight");
+  // TCut weight("300. * weight * genweight * bgweight");
 
   //  TCut weight("1000. * weight * genweight * bgweight");
-  //  TCut weight("1000. * weight * genweight * bgweight * agedweight");
+  //  TCut weight("700. * weight * genweight * bgweight");
+  //TCut weight("700. * weight * genweight * bgweight * agedweight");
 
   //------------------------------
   // plot selection
   //------------------------------
 
   //  TCut presel = "";
-  //  TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90;
-  //  TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90 + dphijetmet;
-  //TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100;
-  TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200;
-  //  TCut presel = agednlep1 + agedptlep40 + agedetalep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200;
-  //TCut presel = agednlep1 + agedlep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200;
+  //TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90; // phaseI
+  //TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200; // phaseII
+  //  TCut presel = agednlep1 + agedlep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200; // aged
+  TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90 + photveto100 + dmet200; // PU200
   //  TCut presel = nlep1 + ptlep40 + etalep + njmin2pt40 + nb2pt40cent + mbb90 + dupjets;
   //  TCut sigsel = presel + nj2;
   //  TCut sigsel = presel + nj2 + mt100 + mct160 + met100;
   //  TCut presel3 = presel2 + st750 + met300;// + mct160 + mt300;
   //TCut presel = nlep1 + ptlep30 + nb2;
-  //  TCut sigsel = presel + nj2 + mct160;// + pujetmet200;
-  //TCut sigsel = presel + nj2 + mt100 + mct160;// + met200;
-  //  TCut sigsel = presel + nj2 + mt100 + mct160 + met200;
-  TCut sigsel = presel + nj2 + pujetmt100 + mct160;// + pujetmet200;
-  //TCut sigsel = presel + nj2 + smearmt100 + mct160;// + smearmet200;
+  //TCut sigsel = presel + nj2 + mct160;// + pujetmet200;
+  //  TCut sigsel = presel + nj2 + mt100 + mct160;// + met200; // phaseI
+  // TCut sigsel = presel + nj2 + mt100 + mct160 + met200;
+  //  TCut sigsel = presel + nj2 + pujetmt100 + mct160;// + pujetmet200; // phaseII
+  //TCut sigsel = presel + nj2 + smearmt100 + mct160;// + smearmet200; // aged
+  //TCut sigsel = presel + nj2 + smearmt150 + mct160;// + smearmet200; // PU200
+  TCut sigsel = presel + nj2 + smearmt200 + mct160;// + smearmet200; // NoTrkExt
 
-  TCut plotsel = presel;
-  //TCut plotsel = sigsel;
+  //TCut plotsel = presel;
+  TCut plotsel = sigsel;
 
   bool printplots = false;
 
@@ -576,21 +589,21 @@ void plotMaker_WH(){
   // makePlot( samples , names , (char*)"bjet1pt"   , (char*) "leading b-jet p_{T} (GeV)" , TCut(plotsel)              , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
   //  makePlot( samples , names , (char*)"met"  , (char*) "E_{T}^{miss} (GeV)"    , TCut(plotsel) , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
   //  makePlot( samples , names , (char*)"met"  , (char*) "E_{T}^{miss} (GeV)" , "Events / 50 GeV"   , TCut(plotsel) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
-  //  makePlot( samples , names , (char*)"smearmet"  , (char*) "E_{T}^{miss} (GeV)" , "Events / 50 GeV"   , TCut(plotsel) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
+  //makePlot( samples , names , (char*)"smearmet"  , (char*) "E_{T}^{miss} (GeV)" , "Events / 50 GeV"   , TCut(plotsel) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
   //  makePlot( samples , names , (char*)"pujetmet"  , (char*) "PUJET E_{T}^{miss} (GeV)"    , TCut(plotsel) , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
-  //  makePlot( samples , names , (char*)"pujetmet"  , (char*) "E_{T}^{miss} (GeV)",  "Events / 50 GeV"   , TCut(plotsel) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
+  // makePlot( samples , names , (char*)"pujetmet"  , (char*) "E_{T}^{miss} (GeV)",  "Events / 50 GeV"   , TCut(plotsel) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
   // makePlot( samples , names , (char*)"mt"  , (char*) "M_{T} (GeV)"    , TCut(plotsel) , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
   // makePlot( samples , names , (char*)"pujetmt"  , (char*) "M_{T} (GeV)"  ,  "Events / 50 GeV"   , TCut(plotsel) , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
-  // makePlot( samples , names , (char*)"smearmt"  , (char*) "smeared M_{T} (GeV)"  ,  "Events / 50 GeV"   , TCut(plotsel) , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
+  //makePlot( samples , names , (char*)"smearmt"  , (char*) "smeared M_{T} (GeV)"  ,  "Events / 50 GeV"   , TCut(plotsel) , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
   // makePlot( samples , names , (char*)"mct"  , (char*) "M_{CT} (GeV)"    , TCut(plotsel) , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
   // // //makePlot( samples , names , (char*)"ptbb" , (char*) "p_{T}(bb) (GeV)" , TCut(plotsel) , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
   // makePlot( samples , names , (char*)"mbb"  , (char*) "M_{bb} (GeV)"    , TCut(nlep1 + ptlep30 + nb2cent + met50) , weight , 50 , 0 , 500 , sig_mchi , sig_mlsp , printplots , false );
 
   //  makePlot( samples , names , (char*)"min(acos(cos(bjet1phi-metphi)),acos(cos(bjet2phi-metphi)))"  , (char*) "min #Delta#phi(jet,MET)"    , TCut(plotsel) , weight , 50 , 0 , 3.14159 , sig_mchi , sig_mlsp , printplots );
 
-  makePlot( samples , names , (char*)"pujetmt"  , (char*) "M_{T} (GeV)", "Events / 50 GeV"    , TCut(plotsel + nj2) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
-  makePlot( samples , names , (char*)"mct"  , (char*) "M_{CT} (GeV)", "Events / 50 GeV"    , TCut(plotsel + nj2 + pujetmt100) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
-  makePlot( samples , names , (char*)"pujetmet"  , (char*) "E_{T}^{miss} (GeV)", "Events / 50 GeV"    , TCut(plotsel + nj2 + pujetmt100 + mct160) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
+  // makePlot( samples , names , (char*)"pujetmt"  , (char*) "M_{T} (GeV)", "Events / 50 GeV"    , TCut(plotsel + nj2) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
+  // makePlot( samples , names , (char*)"mct"  , (char*) "M_{CT} (GeV)", "Events / 50 GeV"    , TCut(plotsel + nj2 + pujetmt100) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
+  // makePlot( samples , names , (char*)"pujetmet"  , (char*) "E_{T}^{miss} (GeV)", "Events / 50 GeV"    , TCut(plotsel + nj2 + pujetmt100 + mct160) , weight , 20 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
 
 
   // makePlot( samples , names , (char*)"lep1pt"   , (char*) "lepton p_{T} (GeV)" , TCut(plotsel+met300)              , weight , 50 , 0 , 1000 , sig_mchi , sig_mlsp , printplots );
@@ -627,21 +640,25 @@ void plotMaker_WH(){
 
   std::vector<std::string> selections;
 
+  // // phaseII
   // selections.push_back((sigsel+pujetmet200).GetTitle());
   // selections.push_back((sigsel+pujetmet300).GetTitle());
   // selections.push_back((sigsel+pujetmet400).GetTitle());
   // selections.push_back((sigsel+pujetmet500).GetTitle());
 
+  // // phaseI
   // selections.push_back((sigsel+met200).GetTitle());
   // selections.push_back((sigsel+met300).GetTitle());
   // selections.push_back((sigsel+met400).GetTitle());
   // selections.push_back((sigsel+met500).GetTitle());
 
+  // aged, PU200, NoTrkExt
   selections.push_back((sigsel+smearmet200).GetTitle());
   selections.push_back((sigsel+smearmet300).GetTitle());
   selections.push_back((sigsel+smearmet400).GetTitle());
   selections.push_back((sigsel+smearmet500).GetTitle());
+  selections.push_back((sigsel+smearmet600).GetTitle());
 
-  //  print_table(samples, names, selections, weight, sig_mchi, sig_mlsp);
+  print_table(samples, names, selections, weight, sig_mchi, sig_mlsp);
 
 }
